@@ -1,0 +1,10 @@
+name: "Khanh Rocket Lab - Local Status"
+description: "Local-only display of aggregate Egern observations."
+author: "Vcab3011"
+homepage: "https://github.com/Vcab3011/Khanh-Rocket"
+scriptings:
+  - generic:
+      name: "Khanh Multi-App Status"
+      script_url: "https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/64e4a8ff606a329ca6bedc750f8bed58c590feb6/lab/build/egern-status.js"
+      timeout: 10
+      update_interval: 86400
