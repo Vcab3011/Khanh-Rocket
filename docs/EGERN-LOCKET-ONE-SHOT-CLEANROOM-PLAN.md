@@ -1,6 +1,6 @@
 # Khanh Rocket — Egern One-shot / Shadowrocket V3 Clean-room Design
 
-**Status:** Research and implementation proposal; NOT a claim of permanent Locket Gold or of server-side entitlement changes. **Date:** 2026-10-08.
+**Status:** Reverse engineering of the supplied YAML and a user-provided JavaScript listing, with implementation proposal. User-provided JS provenance is NOT independently verified; no claim of permanent Locket Gold or of server-side entitlement changes. **Date:** 2026-10-08.
 
 **Production freeze:** This document must not edit, merge, overwrite or regenerate `main/build/khanh-rocket.conf`. The currently working Shadowrocket V3 test profile at `v3-test/build/khanh-rocket-v3-test.conf` also remains unchanged. Any experimentation must be on separate branches and canaries.
 
@@ -14,17 +14,45 @@ An actual server-side entitlement requires the service/provider to grant it. Loc
 
 ## 2. Evidence-based reverse engineering of user-provided 2024 artifact
 
-Artifact: user-supplied `locket 2.yaml`, 27 lines, posted historically alongside a VOZ guide; shared source credited in the post to **lea_qun**. We inspected the YAML, **not** the external JavaScript.
+Artifact: user-supplied `locket 2.yaml`, 27 lines, posted historically alongside a VOZ guide; shared source credited in the post to **lea_qun**. We inspected the YAML and a subsequently **user-provided JavaScript listing claimed to be the original script**. The live remote script remains inaccessible; byte-for-byte provenance and revision are not independently established.
 
 | Evidence | What is confirmed | What is not proven |
 |---|---|---|
 | `mitm.enabled: true`, `ca_p12: egern.p12`, `ca_passphrase: egern`, `hostnames: [api.revenuecat.com]` | Egern decrypts selected HTTPS traffic using an Egern CA reference | That the provided CA file is safe, unique, or still available |
 | Two request `header_rewrites` delete `X-RevenueCat-ETag` case variants | Removes request cache validators for matching `receipts/subscribers` URLs | This alone grants a subscription |
 | `http_response` `Locket_Gold_AQVPN`, regex on RevenueCat `receipts` and `subscribers/{id}`, `body_required: true` | Script sees matching response bodies | Whether it verifies User-Agent, edits other apps, leaks credentials, or uses remote calls |
-| `script_url: https://download.aqvpn.eu.org/script/apptesters/Locket_Gold.js` | Runtime depends on third-party, mutable code | Source behavior: unavailable at time of audit |
+| `script_url: https://download.aqvpn.eu.org/script/apptesters/Locket_Gold.js` | Runtime depends on third-party, mutable code | Whether user-provided JS matches exact historic downloaded bytes is unverified |
 | `update_interval: 5` | Egern script-file update interval in seconds | Entitlement refresh or automatic one-shot execution |
 
-External source retrieval attempted; `Locket_Gold.js` not accessible by ordinary public fetch on 2026-10-08. **Do not invent or assert its unseen implementation.** Future exact recovery: cached Egern bundle, user's own historic file copy, authorized code archive, then hash, static triage and sandbox execution with synthetic data only. Never run unknown JS on a primary phone.
+External source retrieval attempted; the hosted `Locket_Gold.js` was inaccessible through ordinary public fetch on 2026-10-08. The user **subsequently supplied JavaScript text** corresponding to this technique. Analyze the text as given; the match to the installed historical artifact is still **unverified** because no locally extracted binary with hash is available. Reconcile by exporting the old Egern cache, hashing and comparing the actual file; avoid executing historical code on a primary device.
+
+### 2A. Static reverse engineering of the supplied JavaScript
+
+**Precisely observable operations in the user-provided source:**
+
+1. Reads `$request` and creates an authenticated **second request** to `https://api.revenuecat.com/v1/product_entitlement_mapping` using the intercepted original request's `authorization` and `user-agent` headers, plus `X-Platform: iOS`.
+2. Uses `$httpClient.get(options, callback)` to retrieve mapping data, then immediately `JSON.parse(data)`. The returned `error` and `newResponse` parameters are ignored.
+3. Constructs an **entire new response object** with `request_date`, `subscriber`, empty purchase maps, a fixed `original_app_user_id`, and hard-coded historical timestamps.
+4. Iterates `product_entitlement_mapping` entries; for each `product_identifier` and each entitlement listed in `entitlements`, sets `subscriber.entitlements[entitlement]` and `subscriber.subscriptions[productIdentifier]` to synthetic `PURCHASED` / `app_store` data with far-future `expires_date: 9692-01-01T01:01:01Z`. The outer loop key `entitlementId` is unused.
+5. Ends with `body = JSON.stringify(jsonToUpdate); $done({body});`, replacing the **entire** targeted response body. It does **not** preserve real subscriber data or merge only the Gold field.
+6. The snippet contains **no local storage API or durable account modification call**. The observed state continuing after Egern is stopped must be explained through client persistence, UI cache, legitimate backend state, or another mechanism, not storage in this JS alone.
+
+**Why dynamic mapping matters:** unlike the current V3 Locket script which hard-codes the `Gold` entitlement, this snippet derives product IDs and entitlement names from a RevenueCat mapping response. That reduces hard-coded assumptions but introduces an extra live API call and potentially modifies every entitlement in the mapping. It does **not** establish that the platform recognizes real purchases.
+
+**Source-level defects and security risks:**
+
+- No response status, `error`, or JSON shape validation; malformed JSON, blocked extra request, or missing `product_entitlement_mapping` can throw before `$done` runs.
+- No request method, product bundle, or Locket User-Agent guard inside the supplied JS. The YAML matches a shared RevenueCat domain. Whether upstream Egern routing limits invocation to one app is not proven.
+- Takes `Authorization` from live requests; passes it to a *RevenueCat-hosted* mapping endpoint. That is not, by itself, off-site exfiltration, but the third-party script publisher can change code later; the token is sensitive and should never be logged, cached, or sent to other destinations.
+- Uses old-style `$httpClient` globals; Egern compatibility layer and error behavior require on-device verification. This does not prove a native Egern ES-module `ctx` implementation.
+- Replaces the entire subscriber, drops real purchase history and account metadata; a hard-coded original user ID may conflict with the request account. Far-future expiry and contradictory dates are not genuine App Store transactions and may be rejected by receipt or signature verification.
+- No call timeout, fallback on parse failures, correlation with original subscriber account, or privacy-preserving diagnostics. The `body` variable is assigned without declaration, potentially creating a global in non-strict runtimes.
+- Client-visible state can persist after a modified response is delivered and cached, but that is a **hypothesis** about the iOS SDK. Restore Purchase may trigger new network responses; it does not prove an actual server-side purchase.
+
+**Clean-room architectural lesson (do not copy the code):** a metadata-discovery adapter can inspect safe non-secret entitlement schema information for a consented diagnostic session. The response pipeline should be **read-only by default**, validate source/status/schema, preserve original bytes, restrict app scope, never synthesize unpurchased entitlements, and separately measure persistence after VPN disconnection.
+
+**Updated provenance:** third-party configuration historically attributed by user to `lea_qun`; exact authorship/licensing of the pasted JavaScript is not independently verified. Record attribution for background research and do not redistribute its source as original Khanh Rocket code.
+
 
 ### The user's observed behavior
 
@@ -91,7 +119,7 @@ Event schema allowlist only: `{v, observedAt, platform, appVersion?, statusCode,
 ## 5. Supply-chain and privacy policy
 
 - Egern/Shadowrocket scripts served **only** from `Vcab3011/Khanh-Rocket/<full-commit-sha>/...`, not external updater, `latest`, `main` or mutable third-party URLs. Audited pinned source and manifest hash; CI checks references.
-- Do not fetch, run or redistribute `Locket_Gold.js` during runtime; record historical credit **lea_qun** for analysis of the supplied third-party configuration, without claiming authorship of clean-room code.
+- Do not fetch, run or redistribute historic `Locket_Gold.js` during runtime; do not include the pasted third-party source in first-party runtime bundles; record historical credit **lea_qun** for analysis of the supplied third-party configuration, without claiming authorship of clean-room code.
 - Never embed a shared `egern.p12` or fixed global CA passphrase. Each device creates its own CA in Egern, with explicit per-device trust and scope-limited MITM.
 - Do not transmit or persist App Store receipts, RevenueCat API keys, authorizations, app-user IDs, email addresses or raw HTTPS payloads.
 - Strict pass-through on non-Locket User-Agent, unknown paths, malformed body, non-200 status, oversized body or missing certificate.
@@ -102,7 +130,7 @@ Event schema allowlist only: `{v, observedAt, platform, appVersion?, statusCode,
 
 | Phase | Scope and deliverable | Go/no-go gate |
 |---|---|---|
-| **P0 Evidence acquisition** | Capture original JS only if lawful and available, SHA256, timestamp, license; build evidence ledger + exact confidence levels | No false statements about missing JS; sensitive content redacted |
+| **P0 Evidence + provenance verification** | Compare user-supplied JS against Egern's cached file if accessible; record cryptographic SHA256, original URL, license and source confidence; document mapped entitlements and error handling | No false statements about missing JS; sensitive content redacted |
 | **P1 Protocol model** | Document observed RevenueCat paths, request methods, content-types, ETag / 304, JSON schema variations and end-to-end flow | Synthetic fixture suite, unknown-field preservation, no real credentials |
 | **P2 Egern MVP** | Complete native `egern/modules/locket-observe.yaml`, read-only `locket-cache-probe.js`, status widget, manual test instructions | YAML schema validation, Node ES-module tests, no interception of unrelated apps |
 | **P3 One-shot test controller** | Recording of user-initiated T0/T+5/T+30/T+24h observations, strict local TTL & reset; docs for VPN-off verification | At least 2 devices, offline/online/restart matrix; no collection of PII |
@@ -110,7 +138,7 @@ Event schema allowlist only: `{v, observedAt, platform, appVersion?, statusCode,
 | **P5 Controlled compatibility research** | Analyze client-state vs backend-state behavior without representing local edits as legitimate purchases; device matrix, failure recovery | Independent reviewer + consent, reliability data, rollback validated |
 | **P6 Release decision** | Versioned pinned Egern module and separate pinned Shadowrocket config; changelog, CI badge, clear experimental labels | CI all green, device tests, security review, manual approval before production |
 
-Priority order: P0/P1 -> P2 -> P3 -> P4/P5 -> P6. Do not gate documentation or offline core tests on unavailable upstream JS.
+Priority order: P0/P1 -> P2 -> P3 -> P4/P5 -> P6. The user-provided JS supports a concrete static analysis, but device/cache provenance is still an open P0 check.
 
 ### Tests to implement
 
@@ -124,7 +152,7 @@ Priority order: P0/P1 -> P2 -> P3 -> P4/P5 -> P6. Do not gate documentation or o
 
 ## 7. Questions and risks
 
-- Without the exact external `Locket_Gold.js`, precise historic entitlement editing logic is **unknown**. Only YAML-level reconstruction is complete.
+- The user-provided JS listing reveals a concrete dynamic product-entitlement-mapping and whole-subscriber-response replacement algorithm; **its byte-for-byte identity to the historic external file is unverified** until the cached script can be extracted and compared.
 - Client-side cache persistence does not imply backend authorization, payment or durable Gold. RevenueCat may refresh on app foreground and restore.
 - Script that consumes `ctx.response.text()` must return original body when no modification is intended, because the stream is one-shot. Ensure exact headers/status/body preservation in Egern device tests.
 - `header_rewrites` on the supplied artifact may be broad for all apps using RevenueCat, so don't deploy globally without scoping tests.
