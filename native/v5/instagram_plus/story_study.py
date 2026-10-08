@@ -96,8 +96,9 @@ def ambiguity(eligible_viewers: int, rewatch_value: int | None,
     if rewatch_value > 10000:
         raise ValueError("Count above research cap")
     if semantics == "unique_rewatchers":
-        possibilities = math.comb(eligible_viewers, rewatch_value) \
-            if rewatch_value <= eligible_viewers else 0
+        if rewatch_value > eligible_viewers:
+            return {"assignmentCount": 0, "interpretation": "inconsistent_with_assumptions"}
+        possibilities = math.comb(eligible_viewers, rewatch_value)
     elif semantics == "replay_events":
         possibilities = math.comb(rewatch_value + eligible_viewers - 1, eligible_viewers - 1)
     else:
