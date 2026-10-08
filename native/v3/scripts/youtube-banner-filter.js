@@ -127,7 +127,12 @@
   if(!layout)return false;
   var eml=typedChild(layout,1);
   if(!eml)return false;
-  return hasASCII(eml,"inline_injection_entrypoint_layout.eml");
+  // The original classifier compares eml.split("|")[0] exactly.
+  // This avoids dropping a legitimate tile merely mentioning the marker.
+  var marker="inline_injection_entrypoint_layout.eml";
+  if(eml.length<marker.length)return false;
+  for(var i=0;i<marker.length;i++)if(eml[i]!==marker.charCodeAt(i))return false;
+  return eml.length===marker.length || eml[marker.length]===124;
  }
  function containsUnknownPagead(bytes,type,depth){
   if(depth>7)return false;
