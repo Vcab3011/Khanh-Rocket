@@ -4,9 +4,9 @@ A practical, reproducible ruleset generator for Shadowrocket on iPad/iPhone. Thi
 
 ## iPad test: Apps Privacy
 
-Raw URL (after branch publication):
+Stable URL after merge to main:
 
-`https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/feature/phase2-modular-app-rules/build/apps-privacy.conf`
+`https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/main/build/khanh-rocket.conf`
 
 Config -> '+' -> download URL -> select profile -> Home -> Global Routing **Config** -> enable.
 
@@ -17,8 +17,7 @@ The profile routes `DIRECT`, so it requires no Vietnam VPN node. Device-based sm
 ```powershell
 git clone https://github.com/Vcab3011/Khanh-Rocket.git
 cd Khanh-Rocket
-git fetch origin feature/phase2-modular-app-rules
-git switch feature/phase2-modular-app-rules
+git pull origin main
 py -3 tools/build.py --list-modules
 py -3 tools/build.py --profile apps-privacy
 py -3 tools/build.py --profile apps-privacy --disable app-tiktok-telemetry
