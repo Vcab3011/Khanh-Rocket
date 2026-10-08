@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "description": "Inventory of legacy 10in1 script entrypoints; records inherited code, does not approve code execution",
+  "production_config": "build/khanh-rocket.conf",
+  "baseline_commit": "88dbcb4751cc649592f292811b65acb4bed8837b",
+  "entries": [
+    {
+      "id": "Sub-Store Core",
+      "group": "subscription-api",
+      "phase": "http-request",
+      "format": "local-api",
+      "risk_indicator": "unreviewed-release",
+      "url": "https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-1.min.js"
+    },
+    {
+      "id": "Sub-Store Simple",
+      "group": "subscription-api",
+      "phase": "http-request",
+      "format": "local-api",
+      "risk_indicator": "unreviewed-release",
+      "url": "https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-0.min.js"
+    },
+    {
+      "id": "Sub-Store Sync",
+      "group": "scheduled-sync",
+      "phase": "cron",
+      "format": "network-storage",
+      "risk_indicator": "unreviewed-release",
+      "url": "https://github.com/sub-store-org/Sub-Store/releases/latest/download/cron-sync-artifacts.min.js"
+    },
+    {
+      "id": "youtube.request",
+      "group": "youtube-engine",
+      "phase": "http-request",
+      "format": "protobuf",
+      "risk_indicator": "complex-binary",
+      "url": "https://raw.githubusercontent.com/duyvinh09/Module_IOS/refs/heads/main/js/youtube.response.js"
+    },
+    {
+      "id": "youtube.response",
+      "group": "youtube-engine",
+      "phase": "http-response",
+      "format": "protobuf",
+      "risk_indicator": "complex-binary",
+      "url": "https://raw.githubusercontent.com/duyvinh09/Module_IOS/refs/heads/main/js/youtube.response.js"
+    },
+    {
+      "id": "spotify-json",
+      "group": "spotify-url",
+      "phase": "http-request",
+      "format": "url",
+      "risk_indicator": "scoped-url",
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/spotify-json.js"
+    },
+    {
+      "id": "spotify-proto",
+      "group": "spotify-engine",
+      "phase": "http-response",
+      "format": "protobuf",
+      "risk_indicator": "complex-binary",
+      "url": "https://raw.githubusercontent.com/app2smile/rules/master/js/spotify-proto.js"
+    },
+    {
+      "id": "SoundCloudGo+",
+      "group": "app-response",
+      "phase": "http-response",
+      "format": "json",
+      "risk_indicator": "synthetic-premium",
+      "url": "https://raw.githubusercontent.com/duyvinh09/Module_IOS/refs/heads/main/js/SoundCloudGoPlus.js"
+    },
+    {
+      "id": "AlightMotion",
+      "group": "app-response",
+      "phase": "http-response",
+      "format": "json",
+      "risk_indicator": "synthetic-premium",
+      "url": "https://raw.githubusercontent.com/duyvinh09/Module_IOS/refs/heads/main/js/AlightMotion.js"
+    },
+    {
+      "id": "PicsArt",
+      "group": "app-response",
+      "phase": "http-request",
+      "format": "json",
+      "risk_indicator": "synthetic-purchase",
+      "url": "https://raw.githubusercontent.com/duyvinh09/Module_IOS/refs/heads/main/js/PicsArt.js"
+    },
+    {
+      "id": "Wink",
+      "group": "app-response",
+      "phase": "http-response",
+      "format": "json",
+      "risk_indicator": "post-done-side-effect",
+      "url": "https://raw.githubusercontent.com/duyvinh09/Module_IOS/refs/heads/main/js/WinkVipCrack.js"
+    },
+    {
+      "id": "Truecaller",
+      "group": "app-response",
+      "phase": "http-response",
+      "format": "json",
+      "risk_indicator": "synthetic-premium",
+      "url": "https://raw.githubusercontent.com/duyvinh09/Module_IOS/refs/heads/main/js/TrueCaller.js"
+    },
+    {
+      "id": "Kinemaster",
+      "group": "app-response",
+      "phase": "http-response",
+      "format": "json",
+      "risk_indicator": "synthetic-premium",
+      "url": "https://raw.githubusercontent.com/duyvinh09/Module_IOS/refs/heads/main/js/Kinemaster.js"
+    },
+    {
+      "id": "Camscanner",
+      "group": "app-response",
+      "phase": "http-response",
+      "format": "json",
+      "risk_indicator": "unguarded-nested-write",
+      "url": "https://raw.githubusercontent.com/duyvinh09/Module_IOS/refs/heads/main/js/camScanner.js"
+    },
+    {
+      "id": "BeautyPlus",
+      "group": "app-response",
+      "phase": "http-response",
+      "format": "json",
+      "risk_indicator": "synthetic-balance",
+      "url": "https://raw.githubusercontent.com/duyvinh09/Module_IOS/refs/heads/main/js/BeautyPlus.js"
+    },
+    {
+      "id": "revenuecat",
+      "group": "revenuecat-response",
+      "phase": "http-response",
+      "format": "json",
+      "risk_indicator": "generic-host-blast-radius",
+      "url": "https://raw.githubusercontent.com/duyvinh09/Module_IOS/refs/heads/main/js/Locket_DuyVinh09.js"
+    },
+    {
+      "id": "deleteHeader",
+      "group": "revenuecat-headers",
+      "phase": "http-request",
+      "format": "headers",
+      "risk_indicator": "etag-rewrite-duplicate",
+      "url": "https://raw.githubusercontent.com/duyvinh09/Module_IOS/refs/heads/main/js/deleteHeader.js"
+    }
+  ]
+}

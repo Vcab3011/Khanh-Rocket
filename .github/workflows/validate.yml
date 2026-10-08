@@ -15,6 +15,16 @@ jobs:
           python-version: '3.12'
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
+      - name: Test Khanh Native audit and baseline lock
+        run: |
+          python -m unittest discover -s native/tests -p 'test_*.py' -v
+          python native/tools/audit_pipeline.py > /tmp/khanh-native-audit.json
+      - name: Test Khanh Native policy modules (offline)
+        run: node --test native/tests/*.test.cjs
+      - name: Validate independent V2 scriptlets and protobuf codecs
+        run: node --test native/v2/tests/*.test.cjs
+      - name: Validate canary isolation and production baseline
+        run: python -m unittest discover -s native/v2/tests -p 'test_*.py' -v
       - name: Validate generated profiles
         run: |
           python tools/build.py --profile canada-direct
