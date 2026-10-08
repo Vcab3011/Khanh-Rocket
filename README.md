@@ -40,17 +40,9 @@ Source reviewed: https://github.com/Gaucuto/ver2promax/blob/main/10in1 at commit
 
 ## Stable URL (iPad / iPhone)
 
-Import this URL in Shadowrocket's **Config → +** to obtain the maintained default profile:
-
 `https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/main/build/khanh-rocket.conf`
 
-After future releases, refresh the same existing config URL in Shadowrocket; **it does not auto-update instantly** and may require manual re-download. Default currently uses the Phase 2 **Apps Privacy (Experimental)** profile with DIRECT egress and optional ad/telemetry blocking. It **does not grant app Premium subscriptions** and may disrupt apps; use `build/canada-direct.conf` for rollback. A Vietnam VPN server/node is still separate and not bundled.
-
-The canonical file is generated from `apps-privacy` and kept in sync by CI:
-
-```bash
-python tools/build.py --profile apps-privacy --output build/khanh-rocket.conf
-```
+The stable URL now serves the **10in1 compatibility profile**, not the earlier privacy-only profile. It enables URL/Header Rewrite, Map Local, MITM and remote third-party JavaScript. It is experimental and **not security audited**; only install a HTTPS certificate you explicitly trust. Read [compatibility notes](docs/LEGACY_10IN1.md) before using. The older privacy baseline remains at `build/apps-privacy.conf`.
 
 ## Phase 2 preview (experimental)
 
