@@ -26,7 +26,7 @@ function invoke(kind,bytes,status=200){
    Uint8Array,ArrayBuffer,Number,Object,Math,String
  };
  vm.runInNewContext(code,ctx,{timeout:2000});
- assert.equal(returns.length,1);return returns[0];
+ assert.equal(returns.length,1);return returns[0] && returns[0].body instanceof Uint8Array ? returns[0] : JSON.parse(JSON.stringify(returns[0] || {}));
 }
 const opaque=field(121,Uint8Array.from(Buffer.concat([Buffer.from("pagead"),Buffer.alloc(1100)])));
 const good=field(153515154,field(5,Uint8Array.from(Buffer.from("normal video"))));
