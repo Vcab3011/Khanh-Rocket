@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+server/vn-vps/config.json
+server/vn-vps/.env
+secrets/
+*.key
+*.p12
+*.pem
+.DS_Store
