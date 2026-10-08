@@ -25,6 +25,15 @@ jobs:
         run: node --test native/v2/tests/*.test.cjs
       - name: Validate canary isolation and production baseline
         run: python -m unittest discover -s native/v2/tests -p 'test_*.py' -v
+      - name: Verify V3 first-party build determinism and least-privilege MITM
+        run: |
+          python -m unittest discover -s native/v3/tests -p 'test_*.py' -v
+          python native/v3/build_canary.py --profile privacy --check
+          python native/v3/build_canary.py --profile compat --check
+      - name: Enforce reviewed script hashes and deny unsafe network/storage APIs
+        run: python native/v3/audit_supply_chain.py
+      - name: Test V3 offline subscription manager with no network APIs
+        run: node --test native/v3/tests/*.test.cjs
       - name: Validate generated profiles
         run: |
           python tools/build.py --profile canada-direct
