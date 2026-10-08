@@ -1,0 +1,26 @@
+{
+  "schema": "khanh.igplus.observations.v1",
+  "observations": [
+    {
+      "feature": "story_preview",
+      "stage": "offer",
+      "ui": "visible",
+      "action": "not_tested",
+      "evidence": "self_ui"
+    },
+    {
+      "feature": "story_rewatch_insights",
+      "stage": "offer",
+      "ui": "visible",
+      "action": "not_tested",
+      "evidence": "self_ui"
+    },
+    {
+      "feature": "custom_app_icon",
+      "stage": "feature_screen",
+      "ui": "unknown",
+      "action": "not_tested",
+      "evidence": "none"
+    }
+  ]
+}
