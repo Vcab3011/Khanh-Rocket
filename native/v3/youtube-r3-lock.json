@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "baseline_ref": "769a81c5edb1fd21d696aaf2c10fc6ee6ec0a766",
+  "source_ref": "34aa571c69654590302b5dde757924ecd06c6372",
+  "path": "native/v3/scripts/youtube-response-r3.js",
+  "sha256": "e007244ed4436ffa2e97c3ed4cc3e20771ff6a7835e29db0db136c81c3566642"
+}
