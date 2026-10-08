@@ -48,6 +48,14 @@ class ModulesTest(unittest.TestCase):
         status=data["scriptings"][0]["generic"]
         self.assertIn("/" + WIDGET_SHA + "/lab/build/egern-status.js",status["script_url"])
 
+    def test_reset_module_is_manual_and_has_no_mitm(self):
+        data=yaml.safe_load((MODULES/"egern-observe-reset.yaml").read_text(encoding="utf-8"))
+        self.assertNotIn("mitm",data)
+        self.assertEqual(len(data["scriptings"]),1)
+        reset=data["scriptings"][0]["generic"]
+        self.assertIn("/3f9f748ca90e7cf2c68aef1f039014d7c8b6c7f6/lab/build/egern-reset.js",reset["script_url"])
+        self.assertEqual(reset["update_interval"],86400)
+
     def test_no_production_files_edited_by_bundler(self):
         source=(ROOT/"tools/build_runtime.py").read_text(encoding="utf-8")
         self.assertNotIn("build/khanh-rocket.conf",source)
