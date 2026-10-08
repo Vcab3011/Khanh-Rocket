@@ -71,7 +71,7 @@ def normalize(catalog: object, observations: object) -> list[dict]:
             item.get("feature"), item.get("stage"), item.get("ui"),
             item.get("action"), item.get("evidence"),
         )
-        if key not in index or stage not in STAGES or ui not in UI or \
+        if not isinstance(key, str) or key not in index or stage not in STAGES or ui not in UI or \
             action not in ACTION or evidence not in EVIDENCE:
             raise ValueError("Invalid feature or observation state")
         uniq = (key, stage)
