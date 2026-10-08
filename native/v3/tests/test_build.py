@@ -45,7 +45,7 @@ class V3BuildTest(unittest.TestCase):
                 self.assertEqual(actual, build(profile))
 
     def test_every_script_is_owned_and_commit_pinned(self):
-        for profile, count in (("privacy", 3), ("compat", 14)):
+        for profile, count in (("privacy", 4), ("compat", 15)):
             text = (V3 / f"{profile}-canary.conf").read_text(encoding="utf-8")
             links = sources(text)
             self.assertEqual(len(links), count)
@@ -69,7 +69,7 @@ class V3BuildTest(unittest.TestCase):
         self.assertIn("youtubei.googleapis.com", hosts)
 
     def test_controls_switch_off_mitm_and_hooks_together(self):
-        text = build("privacy", {"youtube", "spotify-url"})
+        text = build("privacy", {"youtube", "youtube-browse", "spotify-url"})
         self.assertNotIn("googlevideo.com", text)
         self.assertNotIn("youtubei.googleapis.com", text)
         self.assertNotIn("spotify.com", text)
