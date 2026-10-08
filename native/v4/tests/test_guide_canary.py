@@ -30,6 +30,21 @@ class V4Isolation(unittest.TestCase):
         self.assertEqual(canary,expected)
         self.assertEqual(len([l for l in canary.splitlines() if "type=http-response" in l and "youtube.native." in l]),2)
 
+    def test_full_progress_canary_keeps_guide_canary_byte_for_byte_except_one_hook(self):
+        guide=(ROOT/V4_PATH).read_text(encoding="utf8")
+        full=(ROOT/"native/v4/build/full-canary.conf").read_text(encoding="utf8")
+        extra=next(l for l in full.splitlines() if l.startswith("Native Local Convert V4 = "))
+        expected=guide.replace("Khanh Rocket V4 GUIDE CANARY (isolated)",
+                               "Khanh Rocket V4 MULTI-FEATURE CANARY (isolated)",1)
+        expected=expected.replace("\n[Map Local]\n","\n"+extra+"\n\n[Map Local]\n",1)
+        self.assertEqual(full,expected)
+        pin="71b3828bae7bedd6022e9428e6ae63926fa23d4f"
+        script="native/v4/scripts/subscriptions-convert.js"
+        self.assertIn(pin+"/"+script,extra)
+        self.assertEqual((ROOT/script).read_bytes(),git_show(pin,script))
+        self.assertEqual(full.count("Native Offline Subscriptions = "),1)
+        self.assertEqual(full.count("Native Local Convert V4 = "),1)
+
     def test_script_commit_stable_and_pinned(self):
         raw=(ROOT/SCRIPT).read_bytes()
         original=git_show(GUIDE_SHA,SCRIPT)
