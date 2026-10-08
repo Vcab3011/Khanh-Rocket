@@ -1,0 +1,10 @@
+name: "Khanh Rocket Lab - Clear Observations"
+description: "Manually erase local multi-app observation history. No network access."
+author: "Vcab3011"
+homepage: "https://github.com/Vcab3011/Khanh-Rocket"
+scriptings:
+  - generic:
+      name: "Clear Khanh Lab History"
+      script_url: "https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/3f9f748ca90e7cf2c68aef1f039014d7c8b6c7f6/lab/build/egern-reset.js"
+      timeout: 10
+      update_interval: 86400
