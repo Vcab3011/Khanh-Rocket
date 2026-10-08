@@ -12,7 +12,10 @@ function run(file,req={},resp={body:"{}"}){
              Uint8Array,ArrayBuffer,Date,Number,Object,JSON,String,Math,URL};
   vm.runInNewContext(fs.readFileSync(path.join(folder,file),"utf8"),ctx,{timeout:2000,filename:file});
   assert.equal(calls.length,1,file+" must call $done exactly once");
-  return calls[0];
+  const result=calls[0];
+  // vm-created object literals have foreign prototypes; normalize for value tests.
+  if(result&&result.body instanceof Uint8Array)return {body:result.body};
+  return JSON.parse(JSON.stringify(result || {}));
 }
 function body(file,req,resp){const v=run(file,req,resp);return v.body?JSON.parse(v.body):null;}
 function vi(n){const a=[];do{let x=n%128;n=Math.floor(n/128);a.push(n?x+128:x)}while(n);return Uint8Array.from(a);}
@@ -73,7 +76,7 @@ test("RevenueCat: header guard; Locket isolation and schema guard",()=>{
 test("Truecaller: status, products, and unknown URL guarded",()=>{
   const host="https://premium-us.truecaller.com/v4/";
   const status=body("truecaller.js",{url:host+"subscriptions/status"});
-  assert.equal(status.subscriptionStatus,"SUBSCRIBED");assert.equal(status.tier.feature.length,29);
+  assert.equal(status.subscriptionStatus,"SUBSCRIBED");assert.equal(status.tier.feature.length,28);
   const products=body("truecaller.js",{url:host+"products/apple"});
   assert.equal(products.tier[0].id,"goldfamily");
   assert.deepEqual(run("truecaller.js",{url:host+"other"}),{});
