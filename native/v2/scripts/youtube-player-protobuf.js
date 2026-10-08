@@ -17,12 +17,13 @@
   var url=String(req.url||"");
   var player=/^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/player(?:[?#]|$)/.test(url);
   var watch=/^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/get_watch(?:[?#]|$)/.test(url);
-  if(!player&&!watch)return done({});
+  var shorts=/^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/reel\/reel_watch_sequence(?:[?#]|$)/.test(url);
+  if(!player&&!watch&&!shorts)return done({});
   if(Number(resp.status||resp.statusCode||200)!==200)return done({});
   var value=resp.bodyBytes!==undefined?resp.bodyBytes:resp.body;
   var original=toBytes(value);
   if(!original||!original.length||original.length>5242880)return done({});
-  var result=watch?rewriteNested(original,[1,2],rewritePlayer):rewritePlayer(original);
+  var result=shorts?rewriteShorts(original):(watch?rewriteNested(original,[1,2],rewritePlayer):rewritePlayer(original));
   if(!result.changed)return done({});
   if(resp.bodyBytes!==undefined)return done({bodyBytes:result.bytes.buffer.slice(result.bytes.byteOffset,result.bytes.byteOffset+result.bytes.byteLength)});
   return done({body:result.bytes});
@@ -121,6 +122,25 @@
   for(var i=0;i<fields.length;i++){
    if(fields[i].no===18){changed=true;continue;}
    out.push(fields[i].raw);
+  }
+  return {bytes:changed?join(out):data,changed:changed};
+ }
+ function rewriteShorts(data){
+  var fields=scan(data),out=[],changed=false;
+  for(var i=0;i<fields.length;i++){
+   var entry=fields[i];
+   if(entry.no!==2||entry.wire!==2){out.push(entry.raw);continue;}
+   var hasOverlay=false;
+   var ef=scan(entry.value);
+   for(var j=0;j<ef.length;j++)if(ef[j].no===1&&ef[j].wire===2){
+    var commands=scan(ef[j].value);
+    for(var k=0;k<commands.length;k++)if(commands[k].no===139608561&&commands[k].wire===2){
+     var reel=scan(commands[k].value);
+     for(var z=0;z<reel.length;z++)if(reel[z].no===8&&reel[z].wire===2)hasOverlay=true;
+    }
+   }
+   if(hasOverlay)out.push(entry.raw);
+   else changed=true;
   }
   return {bytes:changed?join(out):data,changed:changed};
  }
