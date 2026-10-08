@@ -23,6 +23,8 @@ jobs:
         run: node --test native/tests/*.test.cjs
       - name: Validate independent V2 scriptlets and protobuf codecs
         run: node --test native/v2/tests/*.test.cjs
+      - name: Validate canary isolation and production baseline
+        run: python -m unittest discover -s native/v2/tests -p 'test_*.py' -v
       - name: Validate generated profiles
         run: |
           python tools/build.py --profile canada-direct
