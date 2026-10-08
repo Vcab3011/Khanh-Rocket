@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "description": "Reviewed first-party JavaScript source blob lock, SHA1 per git blob format. These hashes are not runtime downloaded-content attestations.",
+  "v2_commit": "d7d43523dd973c0184a70a3398935c15eef96648",
+  "v3_commit": "05f8ae6a3b96eae528b0c786d3de8ccbd0a978b0",
+  "script_blobs": {
+    "native/v2/scripts/alight-motion.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "66c1a35c5d1a6436fb97ae43e1cb342e84e4ddb7"
+    },
+    "native/v2/scripts/beautyplus.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "42dcddddf7283a05ba75e59b611d4774c53d10f0"
+    },
+    "native/v2/scripts/camscanner.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "c218514876ab8a334eadf239c7e1ac803f4a5e82"
+    },
+    "native/v2/scripts/kinemaster.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "acdc2aef6cd4f6cf7cac08fee48b9c3f59fd734f"
+    },
+    "native/v2/scripts/locket-revenuecat.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "78233a699516daf5e67b273a9964e2be0681c151"
+    },
+    "native/v2/scripts/picsart.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "0b822e91b716c0e0ece84ba2fd9e81967dc8738a"
+    },
+    "native/v2/scripts/revenuecat-header.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "474c609e5e079ddbb1863dc1ebfaabae31b3246c"
+    },
+    "native/v2/scripts/soundcloud-go.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "4e23a17ef4c5c0ed34d269361fc84544ff9c0f05"
+    },
+    "native/v2/scripts/spotify-json.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "76d90e2ced503b735b1548dc6b3d9c7eecd8bca3"
+    },
+    "native/v2/scripts/spotify-protobuf.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "57bc527fe01c52c2fae84fd70efc263f86938022"
+    },
+    "native/v2/scripts/truecaller.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "deb07ef6a168c788da5f1d536903624755ce95c5"
+    },
+    "native/v2/scripts/wink.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "8a8bc584abe694fe66a699bf9e8b1022fb13c376"
+    },
+    "native/v2/scripts/youtube-player-protobuf.js": {
+      "ref": "d7d43523dd973c0184a70a3398935c15eef96648",
+      "git_blob_sha1": "d0dea75aeb1a86bb85b234a5ed2aa22eee31b315"
+    },
+    "native/v3/scripts/offline-subscriptions.js": {
+      "ref": "05f8ae6a3b96eae528b0c786d3de8ccbd0a978b0",
+      "git_blob_sha1": "a770f07f38507f0b3b72156980b80ac31458e386"
+    },
+    "native/v3/scripts/youtube-browse.js": {
+      "ref": "05f8ae6a3b96eae528b0c786d3de8ccbd0a978b0",
+      "git_blob_sha1": "bea4f1ea3b1b55a3f4d024ce779bc89752a884db"
+    }
+  },
+  "policy": {
+    "external_script_sources_forbidden": true,
+    "dynamic_code_forbidden": true,
+    "network_client_calls_forbidden": true,
+    "persistent_store_access_forbidden": true,
+    "default_privacy_mitm_is_explicit": true
+  }
+}
