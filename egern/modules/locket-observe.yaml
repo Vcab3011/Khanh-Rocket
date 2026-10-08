@@ -1,0 +1,16 @@
+name: "Khanh Rocket Egern - Read-only Cache Diagnostics"
+description: "Native Egern scripts: observes cache metadata locally; does not change account responses."
+author: "Vcab3011"
+homepage: "https://github.com/Vcab3011/Khanh-Rocket"
+scriptings:
+  - http_response:
+      name: "Locket Cache Read-only Observer"
+      match: "^https://api\\.revenuecat\\.com/v[0-9]+/(subscribers/[^/?#]+|receipts)([?#]|$)"
+      script_url: "https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/d0861a5e876123b719882ecf2bc3fbc9a7dae6fa/egern/scripts/locket-cache-probe.js"
+      body_required: true
+      max_size: 262144
+      timeout: 10
+  - generic:
+      name: "Khanh Locket Cache Status"
+      script_url: "https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/2843cf5980285e1f09a0369ede85a3837b06ad6b/egern/scripts/locket-cache-widget.js"
+      timeout: 10
