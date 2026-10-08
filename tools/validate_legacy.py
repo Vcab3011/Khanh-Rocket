@@ -31,8 +31,8 @@ def inspect(text):
     for section, count in EXPECTED.items():
         if len(sections[section]) != count:
             raise ValueError(f"{section}: expected {count}, got {len(sections[section])}")
-    if "Vcab3011" not in text or "Gaucuto" not in text:
-        raise ValueError("maintainer and original compiler attributions required")
+    if "#!author = Vcab3011" not in text or "docs/LEGACY_10IN1.md" not in text:
+        raise ValueError("maintainer attribution and provenance documentation link required")
     if not all("script-path=https://" in line for line in sections["Script"] if "type=cron" not in line) or any("script-path=http://" in line for line in sections["Script"]):
         raise ValueError("remote script path missing or insecure")
     if not sections["MITM"][0].startswith("hostname = "):
@@ -41,4 +41,4 @@ def inspect(text):
 
 if __name__ == "__main__":
     inspect(CONFIG.read_text(encoding="utf-8"))
-    print("PASS: 10in1 compatibility sections, counts and attribution")
+    print("PASS: 10in1 compatibility sections, counts and maintainer/provenance markers")
