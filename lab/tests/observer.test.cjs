@@ -112,7 +112,7 @@ test("one-shot cache timeline is *observed events*, never claimed active subscri
  const first=inspect(lock,JSON.stringify(customer),"Locket",200,now);
  const after=inspect(lock,JSON.stringify({subscriber:{entitlements:{}}}),"Locket",200,now+5*60000);
  const history=Core.append(Core.append([],first,now),after,now+5*60000);
- assert.deepEqual(history.map(x=>x.goldFieldPresent),[true,false]);
+ assert.deepEqual(own(history.map(x=>x.goldFieldPresent)),[true,false]);
  assertSafe(history);
  assert.equal(Core.summary(history,now+5*60000).apps.locket,2);
 });
