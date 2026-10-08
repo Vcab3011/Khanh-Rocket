@@ -6,6 +6,24 @@ Decryption is enabled. YouTube and Shadowrocket versions, certificate trust,
 active configuration bytes, actual status/body representation and payload schema
 have not been verified on the device. No personal traffic has been collected.
 
+## Current device acceptance: failed
+
+After r2 was published at `769a81c5edb1fd21d696aaf2c10fc6ee6ec0a766`, the user
+again reported both Home/below-video banners and loss of audio when locking the
+screen. This is an actual user device report and supersedes any inference that
+the passing synthetic tests establish usable background playback or ad blocking.
+The old handoff's working-device observation remains historical, not acceptance
+of this release. Do not promote or describe r2 as working on this iPhone.
+
+The user sees the config filename `khanh-rocket-v3-test.conf`. Shadowrocket may
+display the filename rather than the `#!name` metadata. This does not establish
+that the wrong configuration is selected or that the latest bytes are applied.
+Public delivery was rechecked: the shared URL returns the exact r2 checkout and
+both script URLs return bytes matching `youtube-runtime-lock.json` SHA-256.
+No device KR-YT diagnostic lines or current app versions have been provided.
+The next prerequisite is a device invocation/body/status result; do not release
+another speculative classifier or background-player rewrite based on mocks alone.
+
 ## Two reproduced code defects
 
 1. `native/v2/scripts/youtube-player-protobuf.js` uses `Number(response.status)`.
@@ -37,7 +55,17 @@ Continue using:
 
 https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/v3-test/build/khanh-rocket-v3-test.conf
 
-Refresh this configuration and verify its name contains **V3 r2** before testing.
+![QR for the same existing V3 configuration URL](../build/khanh-rocket-v3-test-qr.png)
+
+The user requests QR codes with configuration links from now on. This QR encodes
+the exact URL above, without a redirect, shortener or different configuration.
+It was generated locally with qrcode 8.2 (error correction Q, four-module quiet
+zone, 570x570 PNG) and independently decoded with zxing-cpp 2.3.0 to the exact URL.
+The image stays valid when the configuration at that URL is updated.
+
+Refresh this same configuration before testing. In its text, the `#!name` contains
+**V3 r2** and its two YouTube script URLs contain source commit `9ab2ebbf...`.
+The filename shown by the app may remain `khanh-rocket-v3-test.conf`.
 Fully close/reopen YouTube, refresh Home, open a video and check below-video
 recommendations. Play a normal video, lock the screen and check audio separately.
 
