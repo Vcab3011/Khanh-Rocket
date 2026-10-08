@@ -50,7 +50,9 @@ def summarize_lines(lines, app: str, bundle_id: str) -> dict:
             record = json.loads(raw)
         except (UnicodeError, json.JSONDecodeError) as exc:
             raise ValueError("Malformed report") from None
-        if not isinstance(record, dict) or record.get("type") != "networkActivity":
+        if not isinstance(record, dict):
+            raise ValueError("Invalid event type")
+        if record.get("type") != "networkActivity":
             continue
         if record.get("bundleID") != bundle_id:
             continue
