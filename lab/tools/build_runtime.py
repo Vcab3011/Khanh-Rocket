@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build two standalone Egern scripts; no network and no production writes."""
+"""Build three standalone Egern scripts; no network and no production writes."""
 from __future__ import annotations
 import argparse
 from pathlib import Path
@@ -9,6 +9,7 @@ CORE = ROOT / "core" / "observer-core.js"
 TARGETS = {
     "egern-observer": ROOT / "runtime" / "egern-observer.template.js",
     "egern-status": ROOT / "runtime" / "egern-status.template.js",
+    "egern-reset": ROOT / "runtime" / "egern-reset.template.js",
 }
 
 def render() -> dict[str, str]:
@@ -18,7 +19,8 @@ def render() -> dict[str, str]:
     results = {}
     for name, template in TARGETS.items():
         text = template.read_text(encoding="utf-8")
-        if text.count("__KHANH_CORE__") != 1:
+        expected = 0 if name == "egern-reset" else 1
+        if text.count("__KHANH_CORE__") != expected:
             raise ValueError("missing or duplicate core placeholder")
         result = text.replace("__KHANH_CORE__", source)
         if "ctx.http." in result or "$httpClient" in result or "eval(" in result:

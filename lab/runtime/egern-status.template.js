@@ -8,12 +8,15 @@ export default async function(ctx) {
       previous=ctx.storage.getJSON(KEY);
   }catch(_){}
   const report=Core.summary(previous,Date.now());
-  const last=report.lastObservedAt
+  const last=report.lastObservedAt!==null
     ? new Date(report.lastObservedAt).toISOString().slice(0,16)+"Z":"No captures";
   const lines=[
     "Locket: "+report.apps.locket+"  |  SoundCloud: "+report.apps.soundcloud,
     "YouTube endpoint calls: "+report.apps.youtube,
     "Last observed: "+last,
+    "Last capture: "+(report.lastApp?report.lastApp+" / "+report.lastOutcome:"none"),
+    "Body unavailable: "+report.bodyUnavailable+"  |  Schema drift: "+report.schemaDrift,
+    "Manual: baseline > VPN ON > VPN OFF > reopen > 5m > reboot > 24h.",
     "VPN-off status must be tested manually.",
     "No server-side entitlements are granted."
   ];
