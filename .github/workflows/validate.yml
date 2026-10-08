@@ -30,6 +30,8 @@ jobs:
           python -m unittest discover -s native/v3/tests -p 'test_*.py' -v
           python native/v3/build_canary.py --profile privacy --check
           python native/v3/build_canary.py --profile compat --check
+      - name: Enforce reviewed script hashes and deny unsafe network/storage APIs
+        run: python native/v3/audit_supply_chain.py
       - name: Test V3 offline subscription manager with no network APIs
         run: node --test native/v3/tests/*.test.cjs
       - name: Validate generated profiles
