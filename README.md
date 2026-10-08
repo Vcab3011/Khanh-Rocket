@@ -1,6 +1,6 @@
 # Khanh Rocket v0.1
 
-Personal modular Shadowrocket routing baseline and static audit of Gấu Apple 10in1.
+Personal modular Shadowrocket routing baseline and static audit.
 
 **Status:** Generated configurations passed static checks; not yet tested on an iPhone or deployed to a Vietnamese proxy endpoint. **No working VPN server is bundled.**
 
