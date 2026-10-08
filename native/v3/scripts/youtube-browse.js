@@ -10,6 +10,21 @@
  */
 (function () {
  "use strict";
+ var routes={
+  browse:{9:"content",10:"content"},
+  next:{7:"next_content",8:"content"},
+  search:{4:"content"},
+  next_content:{51779735:"next_result"},
+  next_result:{1:"content"},
+  content:{58173949:"single_column",49399797:"section_list"},
+  single_column:{1:"tab_supported"},
+  tab_supported:{58174010:"tab"},
+  tab:{4:"content"},
+  section_list:{1:"section_supported"},
+  section_supported:{50195462:"rich_items",51845067:"shelf"},
+  shelf:{5:"rich_section"},
+  rich_section:{51431404:"rich_items"}
+ };
  function done(v){return $done(v||{});}
  try{
   var req=(typeof $request==="object"&&$request)||{};
@@ -98,21 +113,7 @@
   return false;
  }
  // Field-number schema recovered for Browse/Next/Search subtrees.
- var routes={
-  browse:{9:"content",10:"content"},
-  next:{7:"next_content",8:"content"},
-  search:{4:"content"},
-  next_content:{51779735:"next_result"},
-  next_result:{1:"content"},
-  content:{58173949:"single_column",49399797:"section_list"},
-  single_column:{1:"tab_supported"},
-  tab_supported:{58174010:"tab"},
-  tab:{4:"content"},
-  section_list:{1:"section_supported"},
-  section_supported:{50195462:"rich_items",51845067:"shelf"},
-  shelf:{5:"rich_section"},
-  rich_section:{51431404:"rich_items"}
- };
+
  function transform(bytes,type,depth){
   if(depth>16)throw Error("maximum protobuf depth exceeded");
   var spec=routes[type]||{},fs=scan(bytes),out=[],changed=false;
