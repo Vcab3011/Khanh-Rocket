@@ -1,0 +1,46 @@
+/* Generated first-party player + get_watch feed adapter.
+ * Player implementation is embedded byte-for-byte from the original reviewed V2
+ * source. Feed runs after player only for get_watch, through one response hook.
+ * Logs contain fixed route/result enums only. No response content or identifiers.
+ */
+(function () {
+ "use strict";
+ var request=(typeof $request==="object"&&$request)||{};
+ var response=(typeof $response==="object"&&$response)||{};
+ var answer={},normalized=false;
+ var route=typeof request.url==="string" && request.url.match(/^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(player|get_watch|reel\/reel_watch_sequence)(?:\?|$)/);
+ try {
+  // The old player Number("HTTP/1.1 200 OK") guard skips a valid response.
+  // Normalize only an explicit, consistent 200 status line; never infer success.
+  var line=typeof response.status==="string" && response.status.match(/^HTTP\/\d(?:\.\d)?\s+200(?:\s[^\r\n]*)?$/);
+  if(line && (response.statusCode===undefined || response.statusCode===200 || response.statusCode==="200")){
+   response=copy(response);response.status=200;normalized=true;
+  }
+  var playerAnswer;
+  player(request,response,function(value){if(playerAnswer===undefined)playerAnswer=value;});
+  answer=playerAnswer||{};
+  if(route && route[1]==="get_watch"){
+   var input=copy(response);
+   if(answer.bodyBytes!==undefined){input.bodyBytes=answer.bodyBytes;delete input.body;}
+   else if(answer.body!==undefined){input.body=answer.body;delete input.bodyBytes;}
+   var feedAnswer;
+   // If feed rejects unknown/malformed bytes, retain the player's completed edit.
+   try {feed(request,input,function(value){if(feedAnswer===undefined)feedAnswer=value;});}catch(_){}
+   if(feedAnswer && (feedAnswer.body!==undefined || feedAnswer.bodyBytes!==undefined))answer=feedAnswer;
+  }
+ }catch(_){}
+ try {
+  if(route && typeof console!=="undefined" && typeof console.log==="function")
+   console.log("KR-YT player-r2 route="+route[1]+" result="+
+    (playerAnswer && (playerAnswer.body!==undefined || playerAnswer.bodyBytes!==undefined)?"changed":"pass")+
+    " normalized_status="+(normalized?1:0));
+ }catch(_){}
+ $done(answer);
+ function copy(value){var out={};Object.keys(value).forEach(function(key){out[key]=value[key];});return out;}
+ function player($request,$response,$done){
+@@PLAYER@@
+ }
+ function feed($request,$response,$done){
+@@FEED@@
+ }
+})();

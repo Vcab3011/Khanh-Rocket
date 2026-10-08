@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "profile_baseline_ref": "c86b3a2bd404800520f5ec0990cf0eeff1de3a75",
+  "source_ref": "9ab2ebbf8713a6db6d4cb495bde54cdcc6a6e086",
+  "sources": {
+    "native/v3/scripts/youtube-feed-filter.js": "0cf9f81643d168c718ab941c3f7ab5ea55b29b53d9f3975abfd5011f3f9e835b",
+    "native/v3/scripts/youtube-player-feed.js": "f7a3fe7cec2bf6469d885e3e2d0ab95e1c95f520e80fad8e2e39a4fbd40e706f"
+  }
+}
