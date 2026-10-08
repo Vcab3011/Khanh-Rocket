@@ -15,13 +15,14 @@ PRODUCTION = ROOT / "build" / "khanh-rocket.conf"
 DEST = ROOT / "native" / "v3" / "build"
 
 V2_COMMIT = "d7d43523dd973c0184a70a3398935c15eef96648"
-V3_COMMIT = "a49356d0024b33a43bd342bbe29b3a57990cd286"
+V3_COMMIT = "05f8ae6a3b96eae528b0c786d3de8ccbd0a978b0"
 OWNER = "Vcab3011/Khanh-Rocket"
 
 # Source names and tested first-party replacement. No third-party runtime JS.
 FEATURES = {
     "youtube": ("youtube.response", "youtube-player-protobuf.js",
                 ("*.googlevideo.com", "youtubei.googleapis.com", "www.youtube.com", "s.youtube.com")),
+    "youtube-browse": ("youtube.response", "youtube-browse.js", ("youtubei.googleapis.com",)),
     "spotify-url": ("spotify-json", "spotify-json.js",
                     ("spclient.wg.spotify.com", "*spclient.spotify.com")),
     "spotify-protobuf": ("spotify-proto", "spotify-protobuf.js",
@@ -41,7 +42,7 @@ FEATURES = {
     "offline-subscriptions": ("Native Offline Subscriptions", "offline-subscriptions.js",
                               ("khanh.invalid",)),
 }
-PRIVACY = {"youtube", "spotify-url", "offline-subscriptions"}
+PRIVACY = {"youtube", "youtube-browse", "spotify-url", "offline-subscriptions"}
 COMPAT = set(FEATURES)
 SHA = re.compile(r"^[0-9a-f]{40}$")
 
@@ -67,7 +68,7 @@ def sections(text: str) -> dict[str, list[str]]:
 
 
 def source(feature: str, filename: str, v2_ref: str, v3_ref: str) -> str:
-    ref, directory = (v3_ref, "v3") if feature == "offline-subscriptions" else (v2_ref, "v2")
+    ref, directory = (v3_ref, "v3") if feature in {"offline-subscriptions", "youtube-browse"} else (v2_ref, "v2")
     return f"https://raw.githubusercontent.com/{OWNER}/{ref}/native/{directory}/scripts/{filename}"
 
 
@@ -99,6 +100,12 @@ def build(profile: str, disabled: set[str] | None = None,
                 f"Native Offline Subscriptions = type=http-request,pattern={pat},"
                 f"requires-body=true,max-size=131072,timeout=10,script-path={uri}"
             )
+        elif feature == "youtube-browse":
+            pat = r"^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|search)(?:\?|$)"
+            script_lines.append(
+                f"youtube.native.browse = type=http-response,pattern={pat},"
+                f"requires-body=true,max-size=5242880,binary-body-mode=1,timeout=10,script-path={uri}"
+            )
         elif feature == "youtube":
             pat = r"^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(player|get_watch|reel\/reel_watch_sequence)(?:\?|$)"
             script_lines.append(
@@ -116,7 +123,7 @@ def build(profile: str, disabled: set[str] | None = None,
                 line = line.replace("max-size=-1", "max-size=262144")
             script_lines.append(line)
 
-    has_youtube = "youtube" in selected
+    has_youtube = "youtube" in selected or "youtube-browse" in selected
     rules = legacy["Rule"] if has_youtube else []
     rewrites = legacy["Url Rewrite"] if has_youtube else []
     map_local = legacy["Map Local"] if has_youtube else []
