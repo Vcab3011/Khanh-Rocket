@@ -37,3 +37,21 @@ python -m unittest discover -s tests -v
 - Independent dynamic testing is needed; passing static checks does not guarantee Shadowrocket compatibility.
 
 Source reviewed: https://github.com/Gaucuto/ver2promax/blob/main/10in1 at commit `70a1343587324ff5a17195d8847ce55001f9ed44`.
+
+## Stable URL (iPad / iPhone)
+
+Import this URL in Shadowrocket's **Config → +** to obtain the maintained default profile:
+
+`https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/main/build/khanh-rocket.conf`
+
+After future releases, refresh the same existing config URL in Shadowrocket; **it does not auto-update instantly** and may require manual re-download. Default currently uses the Phase 2 **Apps Privacy (Experimental)** profile with DIRECT egress and optional ad/telemetry blocking. It **does not grant app Premium subscriptions** and may disrupt apps; use `build/canada-direct.conf` for rollback. A Vietnam VPN server/node is still separate and not bundled.
+
+The canonical file is generated from `apps-privacy` and kept in sync by CI:
+
+```bash
+python tools/build.py --profile apps-privacy --output build/khanh-rocket.conf
+```
+
+## Phase 2 preview (experimental)
+
+Phase 2 introduces: 12 opt-in app-specific domain filters, a deterministic rules compiler, stricter linting, iPad test notes, and [original 10in1 feature parity audit](docs/PHASE2.md). These are privacy/ad-network controls **not** Premium unlocks; third-party subscription scripts remain audit-only. Import `build/apps-privacy.conf` from the preview branch on a test device.

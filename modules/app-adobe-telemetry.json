@@ -1,0 +1,12 @@
+{
+  "name": "app-adobe-telemetry",
+  "kind": "domain-rules",
+  "app": "Adobe",
+  "category": "adobe",
+  "status": "experimental; not device-tested",
+  "default_enabled": false,
+  "description": "Blocks selected Adobe analytics endpoint",
+  "rules": [
+    "DOMAIN,sstats.adobe.com,REJECT"
+  ]
+}

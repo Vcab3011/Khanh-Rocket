@@ -1,0 +1,15 @@
+{
+  "name": "Khanh Rocket - Apps Privacy (Experimental)",
+  "description": "Ad and analytics domain rules for selected apps; no Premium unlock",
+  "default_modules": [
+    "ads-lite",
+    "privacy-lite",
+    "app-reddit-telemetry",
+    "app-tiktok-telemetry",
+    "app-twitch-telemetry",
+    "app-amazon-ads",
+    "app-pinterest-telemetry"
+  ],
+  "rules": [],
+  "final": "DIRECT"
+}

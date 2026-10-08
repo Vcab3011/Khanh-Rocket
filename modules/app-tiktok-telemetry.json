@@ -1,0 +1,13 @@
+{
+  "name": "app-tiktok-telemetry",
+  "kind": "domain-rules",
+  "app": "TikTok",
+  "category": "tiktok",
+  "status": "experimental; not device-tested",
+  "default_enabled": false,
+  "description": "Blocks selected TikTok analytics/logging hostnames",
+  "rules": [
+    "DOMAIN,analytics.tiktok.com,REJECT",
+    "DOMAIN,log.tiktokv.com,REJECT"
+  ]
+}

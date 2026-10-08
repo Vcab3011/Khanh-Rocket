@@ -1,0 +1,12 @@
+{
+  "name": "app-spotify-telemetry",
+  "kind": "domain-rules",
+  "app": "Spotify",
+  "category": "spotify",
+  "status": "experimental; not device-tested",
+  "default_enabled": false,
+  "description": "Experimental telemetry block; cannot enable Premium",
+  "rules": [
+    "DOMAIN,log.spotify.com,REJECT"
+  ]
+}
