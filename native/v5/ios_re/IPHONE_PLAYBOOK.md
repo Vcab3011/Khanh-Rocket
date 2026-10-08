@@ -1,0 +1,61 @@
+# iPhone research playbook — no jailbreak or account-token export required
+
+## Start with Apple's own App Privacy Report
+
+Apple supports **App Privacy Report**, which records a local history of contacted domains and resource accesses, viewable from **Settings → Privacy & Security → App Privacy Report**. It is available on modern iOS versions and does not require HTTPS MITM. Apple documents its exported format as **NDJSON** events, including `type: "networkActivity"`, `domain`, `bundleID`, `hits`, timestamps and contextual information.
+
+Official reference: https://developer.apple.com/documentation/Network/inspecting-app-activity-data
+
+**Do not upload the raw export to GitHub or paste it in chat:** its timestamps, bundle IDs, external domains, Safari/web contexts or other per-app activity can reveal private information. The tool below outputs only aggregate, app-scoped labels.
+
+### On the iPhone
+
+1. Open **Settings → Privacy & Security → App Privacy Report** and enable it if disabled.
+2. Open Instagram → Instagram Plus offer → close offer → try a normal, legitimately available feature → close and reopen. Note which behavior is a visible UI change versus a completed service action.
+3. Open Snapchat → Snapchat+ offer → Memories storage page → close and reopen. Do **not** upload or delete Memories as part of the research.
+4. Return to **App Privacy Report → Share**, save to a locally controlled Mac or Windows machine.
+5. The exported file contains **multiple apps** and covers up to approximately seven days; it cannot isolate a single button click or prove an endpoint. Inspect it locally to identify the exact bundle IDs relevant to Instagram and Snapchat without sharing identifiers. Do not assume bundle IDs without verification.
+
+### On your own computer
+
+```sh
+# Requires Python 3.12, no pip install or external libraries.
+# Use the REAL app bundle IDs observed in your local export.
+python native/v5/ios_re/apple_privacy_report.py local-report.ndjson \
+  --app instagram --bundle-id "BUNDLE_ID_FROM_YOUR_EXPORT" > instagram-summary.json
+python native/v5/ios_re/apple_privacy_report.py local-report.ndjson \
+  --app snapchat --bundle-id "BUNDLE_ID_FROM_YOUR_EXPORT" > snapchat-summary.json
+```
+
+The output includes only aggregate **related vs other domain group** counts, initiated-by-app/user categories, and flags that authorization, exact feature endpoints and transport remain unverified. It never includes literal hostnames, URL paths, timestamps, bundle IDs, account names, cookies or session identifiers. If an app uses a different first-party domain, the tool may put it under “other”; do not assume that means the application does not own it.
+
+### Higher-resolution capture — only with authorization
+
+The repository also contains `har_metadata.py` for pre-existing **user-authorized** HAR network captures, with strict local sanitation; no capture agent, CA, private endpoint access or request rewriting is supplied.
+
+For high-resolution observation, Apple documents Instruments **HTTP Traffic** for applications you are authorized to profile. The official tool may capture unencrypted headers/bodies and sensitive credentials; restrict the profiling process and retain the trace privately. Some app frameworks' transport may not be visible in an HTTP-focused capture.
+
+Source: https://developer.apple.com/documentation/foundation/analyzing-http-traffic-with-instruments
+
+**No assumption of access:** You cannot automatically attach Instruments to every App Store iOS app or decrypt a FairPlay-protected executable. If you do not control or have appropriate debugging access to the app binary, treat this as a vendor/debugging technique, not a guaranteed way to inspect Instagram or Snapchat production builds. Do not defeat TLS pinning, platform attestation, DRM or account-security controls.
+
+## Manual behavior evidence sheet
+
+Record only version/date/feature/state:
+
+| App | Phase | Feature | UI visible? | Legitimate action completed? | Persists after force quit? | Requires online check? |
+|---|---|---|---|---|---|---|
+| Instagram | Offer | Instagram Plus trial | Screenshot: yes | Not purchased; unknown | Not tested | Unknown |
+| Instagram | Feature | Story Preview | Offered in screenshot | Not tested | Not tested | Unknown |
+| Snapchat | Offer | Snapchat+ | Screenshot: yes | Not purchased; unknown | Not tested | Unknown |
+| Snapchat | Storage | Memories | User screen showed **4.5/5 GB** | Actual allocation not independently checked | Not tested | Presumed server-managed; precise method unknown |
+
+Do not infer official subscription status from the displayed premium menu. Snapchat Support confirms 5GB free and commonly 250GB for Snapchat+, which is distinct from claiming your account received 250GB.
+
+Relevant source: https://help.snapchat.com/hc/en-gb/articles/41291271694228-How-do-I-manage-my-Memories-storage
+
+## Next artifact that will actually advance the reverse engineering
+
+Send **only sanitized summaries** generated by the local tools, plus the app/iOS versions and which screen transitions were performed. If any raw HAR/export includes friend names, conversation previews, auth, private Stories or media URLs, do **not** upload it.
+
+To examine underlying native binary architecture instead, an authorized build's Info.plist, framework inventory and **non-sensitive symbol list** can be assessed; app-store production IPA extraction/decryption is **not** a prerequisite to the safer metadata study and should not be requested by default.

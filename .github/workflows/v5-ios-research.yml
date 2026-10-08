@@ -1,0 +1,36 @@
+name: V5 iOS Social Apps Reverse Engineering Research
+on:
+  push:
+    branches: ["research/v5-ios-instagram-snapchat-architecture"]
+  pull_request:
+    paths:
+      - "native/v5/ios_re/**"
+      - ".github/workflows/v5-ios-research.yml"
+permissions:
+  contents: read
+jobs:
+  research-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test privacy-safe HAR and Apple App Privacy Report analysis
+        run: python -m unittest discover -s native/v5/ios_re/tests -p 'test_*.py' -v
+      - name: Test Snapchat+ and Instagram Plus feature matrix isolation
+        run: node --test native/v5/tests/social-plus-audit.test.cjs
+      - name: Verify stable V1/V3/V4 profile blobs
+        run: |
+          python tools/validate_legacy.py
+          test "$(git rev-parse HEAD:native/v4/build/caption-canary.conf)" = "c0de4cad7b85361e2e5a70913aeabe0f1a911e31"
+          test "$(git rev-parse HEAD:build/khanh-rocket-v3-test.conf)" = "05c6202ed4da8964fe8407ea54a5297f454933ef"
+      - name: Assert no network or dynamic code in iOS research analyzer
+        run: |
+          if grep -En 'import (requests|urllib.request|socket|subprocess)|from (requests|urllib.request|socket|subprocess) |eval\(|exec\(|os\.system\(|http\.client' native/v5/ios_re/har_metadata.py native/v5/ios_re/apple_privacy_report.py; then
+            echo "Unexpected execution/network dependency in passive analyzer"
+            exit 1
+          fi
