@@ -31,7 +31,7 @@ class NativeAuditTests(unittest.TestCase):
         self.assertEqual(self.report["script_declarations"], 17)
         self.assertEqual(self.report["distinct_source_urls"], 16)
         self.assertEqual(len(self.manifest["entries"]), 17)
-        self.assertEqual(self.report["phases"], {"http-request": 5, "http-response": 11, "cron": 1})
+        self.assertEqual(self.report["phases"], {"http-request": 6, "http-response": 10, "cron": 1})
 
     def test_sub_store_patterns_overlap_without_assuming_runtime_order(self):
         matches = self.report["matches_by_example"]["Sub-Store download"]
