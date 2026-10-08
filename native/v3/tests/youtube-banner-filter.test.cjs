@@ -126,3 +126,11 @@ test("large nested unknown advertisement field is detected only in typed rendere
   const left=valueOf(valueOf(valueOf(valueOf(out.body,9)[0],49399797)[0],1)[0],50195462)[0];
   assert.equal(valueOf(left,1).length,1);
 });
+
+test("EML prefix is exact and never removes a card merely quoting an ad marker",()=>{
+ const quoted=richWithLayout("ordinary_video.eml|inline_injection_entrypoint_layout.eml");
+ const wrongSuffix=richWithLayout("inline_injection_entrypoint_layout.eml_not_ads");
+ const regular=richWithLayout("regular_item.eml");
+ const source=field(9,listWithItems(quoted,wrongSuffix,regular));
+ assert.deepEqual(invoke("browse",source),{});
+});
