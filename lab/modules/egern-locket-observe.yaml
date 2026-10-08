@@ -1,0 +1,18 @@
+name: "Khanh Rocket Lab - Locket Observer"
+description: "Read-only CustomerInfo observation. Does not modify subscriptions."
+author: "Vcab3011"
+homepage: "https://github.com/Vcab3011/Khanh-Rocket"
+scriptings:
+  - http_response:
+      name: "Khanh Locket CustomerInfo Probe"
+      match: '^https://api\.revenuecat\.com/v[0-9]+/(subscribers/[^/?#]+|receipts)([?#]|$)'
+      script_url: "https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/08492da2a230293140e4e5ff3da11bd87ac5af29/lab/build/egern-observer.js"
+      body_required: true
+      max_size: 262144
+      timeout: 10
+      update_interval: 86400
+# Egern must use the user's own locally generated HTTPS CA.
+mitm:
+  enabled: true
+  hostnames:
+    - "api.revenuecat.com"
