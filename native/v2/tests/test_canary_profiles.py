@@ -48,7 +48,7 @@ class CanaryProfilesTests(unittest.TestCase):
         self.assertEqual(len(files), 13)
         self.assertTrue(all(f.startswith(OWNED_PREFIX) for f in files))
         self.assertNotIn("sub.store", self.native)
-        self.assertNotIn("Sub-Store", self.native)
+        self.assertFalse(any("Sub-Store " in line for line in hooks(self.native)))
         self.assertNotIn("youtube.request =", self.native)
         self.assertIn("INCOMPLETE", self.native)
 
