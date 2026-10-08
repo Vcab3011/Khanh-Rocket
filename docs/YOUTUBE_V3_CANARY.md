@@ -61,4 +61,6 @@ python tools/validate_legacy.py
 
 Node VM tests exercise code with synthetic protobuf, not iOS. Dedicated CI uses Node 22 and checks the pinned source, deterministic profiles and protected bytes. Do not call the profile device-verified until the above checklist passes on the actual iPhone.
 
+Local validation on this revision: **66 Node + 46 Python passed, no failures/skips** (26 new feed cases and 9 new profile/source cases). Existing player tests, exact production/V3/banner blobs, all old canaries, supply-chain audit and legacy validator passed. Local tools: Node 24.19.0 / Python 3.12.14. No new iPhone execution has occurred.
+
 Rollback: `https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/v3-test/build/khanh-rocket-v3-test.conf`. Production also stays unchanged at commit `88dbcb4751cc649592f292811b65acb4bed8837b`.
