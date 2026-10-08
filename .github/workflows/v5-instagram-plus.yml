@@ -1,0 +1,39 @@
+name: Instagram Plus iOS Research Validation
+on:
+  push:
+    branches: ["research/v5-instagram-plus-deep-dive"]
+  pull_request:
+    paths:
+      - "native/v5/instagram_plus/**"
+      - ".github/workflows/v5-instagram-plus.yml"
+permissions:
+  contents: read
+jobs:
+  instagram-plus-study:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Official product feature catalog and evidence-state unit tests
+        run: python -m unittest discover -s native/v5/instagram_plus/tests -p 'test_*.py' -v
+      - name: Verify safe observation example (no accounts or entitlement claims)
+        run: python native/v5/instagram_plus/assess.py native/v5/instagram_plus/EXAMPLE_OBSERVATIONS.json > /dev/null
+      - name: Regression of iOS passive privacy-safe research
+        run: python -m unittest discover -s native/v5/ios_re/tests -p 'test_*.py' -v
+      - name: Regression of existing social-plus observation contracts
+        run: node --test native/v5/tests/social-plus-audit.test.cjs
+      - name: Protect V1 V3 and user-accepted V4
+        run: |
+          python tools/validate_legacy.py
+          test "$(git rev-parse HEAD:build/khanh-rocket-v3-test.conf)" = "05c6202ed4da8964fe8407ea54a5297f454933ef"
+          test "$(git rev-parse HEAD:native/v4/build/caption-canary.conf)" = "c0de4cad7b85361e2e5a70913aeabe0f1a911e31"
+      - name: Prevent accidental hidden network or remote code in IG Plus analyzer
+        run: |
+          if grep -En '(^|[^A-Za-z_])(import requests|import socket|import subprocess|eval\(|exec\(|os\.system\(|urlopen\(|HTTPConnection\()' native/v5/instagram_plus/assess.py; then
+            echo "Unexpected network or code execution in offline classifier"; exit 1
+          fi
