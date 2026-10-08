@@ -1,0 +1,29 @@
+name: V4 isolated parity validation
+on:
+  push:
+    branches: ["feature/v4-source-parity-isolated"]
+  pull_request:
+    paths:
+      - "native/v4/**"
+      - ".github/workflows/v4-parity.yml"
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Guide synthetic binary regression tests
+        run: node --test native/v4/tests/*.test.cjs
+      - name: Profile pins, baseline and exact-delta verification
+        run: python -m unittest discover -s native/v4/tests -p 'test_*.py' -v
+      - name: Validate unchanged V1 baseline
+        run: python tools/validate_legacy.py
