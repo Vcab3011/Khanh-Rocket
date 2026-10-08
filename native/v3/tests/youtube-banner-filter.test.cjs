@@ -63,7 +63,7 @@ test("Large unrecognized protobuf objects are kept rather than globally scanning
 const BANNER_EML = "inline_injection_entrypoint_layout.eml|test-layout";
 function rendered(eml) {
   // ElementRenderer -> VideoRendererContent -> RenderInfo -> LayoutRender -> eml
-  return field(172660663,field(2,field(183314536,field(1,Uint8Array.from(Buffer.from(eml)))));
+  return field(172660663,field(2,field(183314536,field(1,Uint8Array.from(Buffer.from(eml))))));
 }
 function richWithLayout(eml) {
   return field(153515154,rendered(eml));
