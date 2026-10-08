@@ -45,6 +45,20 @@ class V4Isolation(unittest.TestCase):
         self.assertEqual(full.count("Native Offline Subscriptions = "),1)
         self.assertEqual(full.count("Native Local Convert V4 = "),1)
 
+    def test_caption_canary_changes_only_r3_source_and_explicit_caption_option(self):
+        original=(ROOT/"native/v4/build/full-canary.conf").read_text(encoding="utf8")
+        actual=(ROOT/"native/v4/build/caption-canary.conf").read_text(encoding="utf8")
+        old="34aa571c69654590302b5dde757924ecd06c6372/native/v3/scripts/youtube-response-r3.js"
+        new='27c5b4f5c72082bae59f2e91f433dd7a9e5384a0/native/v4/scripts/youtube-response-r4.js,argument="{\\\"captionLang\\\":\\\"vi\\\"}"'
+        expected=original.replace("Khanh Rocket V4 MULTI-FEATURE CANARY (isolated)",
+           "Khanh Rocket V4 CAPTIONS + GUIDE + CONVERTER CANARY (isolated)",1).replace(old,new,1)
+        self.assertEqual(actual,expected)
+        self.assertEqual(actual.count("youtube.native.response = "),1)
+        self.assertEqual(actual.count("youtube.native.guide = "),1)
+        self.assertEqual(actual.count("Native Local Convert V4 = "),1)
+        source="native/v4/scripts/youtube-response-r4.js"
+        self.assertEqual((ROOT/source).read_bytes(),git_show("27c5b4f5c72082bae59f2e91f433dd7a9e5384a0",source))
+
     def test_script_commit_stable_and_pinned(self):
         raw=(ROOT/SCRIPT).read_bytes()
         original=git_show(GUIDE_SHA,SCRIPT)
