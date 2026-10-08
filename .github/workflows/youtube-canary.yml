@@ -1,0 +1,36 @@
+name: YouTube V3 Canary Validation
+on:
+  push:
+    branches: ['feature/youtube-v3-*']
+  pull_request:
+    paths:
+      - 'native/v3/**'
+      - 'native/v2/scripts/youtube-player-protobuf.js'
+      - 'build/khanh-rocket*youtube*.conf'
+      - 'build/khanh-rocket.conf'
+      - 'build/khanh-rocket-v3-test.conf'
+      - '.github/workflows/youtube-canary.yml'
+permissions:
+  contents: read
+jobs:
+  youtube-canary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify pinned source, protected bytes and deterministic canaries
+        run: python native/v3/build_youtube_canary.py --check
+      - name: Test feed filtering and preserved player/protobuf behavior
+        run: node --test native/v2/tests/*.test.cjs native/v3/tests/*.test.cjs
+      - name: Test profile isolation and supply chain
+        run: |
+          python -m unittest discover -s native/v3/tests -p 'test_*.py' -v
+          python native/v3/audit_supply_chain.py
+          python tools/validate_legacy.py

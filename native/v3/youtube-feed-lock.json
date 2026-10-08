@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "path": "native/v3/scripts/youtube-feed-filter.js",
+  "ref": "ca7a2ede3f059fb66cbfd7b542938389e5096d35",
+  "git_blob_sha1": "f41e734871cbba8357524581d72b014a13ca6f69",
+  "sha256": "2155124badca3cbc536c5cbfa1a97f72837cf1f9ae72aba9ebe8fc456b045cb3",
+  "schema_reference_commit": "34865755c1aee7ba770c1afa364254d8924cfd85"
+}
