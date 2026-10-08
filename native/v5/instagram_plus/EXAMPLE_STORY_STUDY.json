@@ -1,0 +1,51 @@
+{
+  "schema": "khanh.igplus.story-study.v1",
+  "countSemantics": "unknown",
+  "timestampSemantics": "unknown",
+  "stages": [
+    {
+      "label": 0,
+      "event": "baseline",
+      "offsetMinutes": 0,
+      "testActor": null,
+      "rewatchDisplay": 0,
+      "viewerTimeOffsets": {
+        "A": 0,
+        "B": null
+      }
+    },
+    {
+      "label": 1,
+      "event": "new_view",
+      "offsetMinutes": 5,
+      "testActor": "B",
+      "rewatchDisplay": 0,
+      "viewerTimeOffsets": {
+        "A": 0,
+        "B": 5
+      }
+    },
+    {
+      "label": 2,
+      "event": "replay_by_consenter",
+      "offsetMinutes": 10,
+      "testActor": "A",
+      "rewatchDisplay": 1,
+      "viewerTimeOffsets": {
+        "A": 10,
+        "B": 5
+      }
+    },
+    {
+      "label": 3,
+      "event": "refresh_only",
+      "offsetMinutes": 11,
+      "testActor": null,
+      "rewatchDisplay": 1,
+      "viewerTimeOffsets": {
+        "A": 10,
+        "B": 5
+      }
+    }
+  ]
+}

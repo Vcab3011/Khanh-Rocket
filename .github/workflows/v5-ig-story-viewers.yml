@@ -1,0 +1,52 @@
+name: V5 Instagram Plus Story Viewer Study
+on:
+  push:
+    branches: ["research/v5-instagram-plus-story-viewers"]
+  pull_request:
+    paths:
+      - "native/v5/instagram_plus/story_study.py"
+      - "native/v5/instagram_plus/EXAMPLE_STORY_STUDY.json"
+      - "native/v5/instagram_plus/tests/test_story_study.py"
+      - "native/v5/instagram_plus/STORY_VIEWER_SCOPE.md"
+      - ".github/workflows/v5-ig-story-viewers.yml"
+permissions:
+  contents: read
+jobs:
+  study:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Story timestamp/replay synthetic and privacy tests
+        run: python -m unittest discover -s native/v5/instagram_plus/tests -p 'test_*.py' -v
+      - name: Verify study output generated deterministically without private data
+        run: |
+          python native/v5/instagram_plus/story_study.py native/v5/instagram_plus/EXAMPLE_STORY_STUDY.json > /tmp/ig-story-study.json
+          python - <<'PY'
+          import json
+          report=json.load(open("/tmp/ig-story-study.json"))
+          assert report["conclusions"]["individualRewatchIdentityVerifiedByInstagram"] is False
+          assert report["conclusions"]["paidPlusEntitlementVerified"] is False
+          assert report["timestampChangeCandidates"] == ["A"]
+          PY
+      - name: Regression of passive iOS research
+        run: python -m unittest discover -s native/v5/ios_re/tests -p 'test_*.py' -v
+      - name: Regression of V5 social app research
+        run: node --test native/v5/tests/social-plus-audit.test.cjs
+      - name: Protect V1, V3 and accepted V4 blobs
+        run: |
+          python tools/validate_legacy.py
+          test "$(git rev-parse HEAD:build/khanh-rocket-v3-test.conf)" = "05c6202ed4da8964fe8407ea54a5297f454933ef"
+          test "$(git rev-parse HEAD:native/v4/build/caption-canary.conf)" = "c0de4cad7b85361e2e5a70913aeabe0f1a911e31"
+      - name: No outbound networking or dynamic evaluation in story study code
+        run: |
+          if grep -En 'urllib.request|requests\.|socket\.|subprocess\.|eval\(|exec\(|\$httpClient|Authorization:' native/v5/instagram_plus/story_study.py; then
+            echo "Unexpected network or dynamic code"; exit 1
+          fi
