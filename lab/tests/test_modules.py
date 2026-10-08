@@ -6,7 +6,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 MODULES = ROOT / "modules"
-OBS_SHA = "08492da2a230293140e4e5ff3da11bd87ac5af29"
+OBS_SHA = "d735822182c8ea215739aa595f6cfff815ea8bac"
 WIDGET_SHA = "64e4a8ff606a329ca6bedc750f8bed58c590feb6"
 APP_HOSTS = {
     "egern-locket-observe.yaml": "api.revenuecat.com",
