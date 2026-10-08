@@ -34,6 +34,8 @@ jobs:
         run: python native/v3/audit_supply_chain.py
       - name: Test V3 offline subscription manager with no network APIs
         run: node --test native/v3/tests/*.test.cjs
+      - name: Verify unchanged player source and deterministic Watch feed adapter
+        run: python native/v3/build_youtube_player_feed.py --check
       - name: Validate generated profiles
         run: |
           python tools/build.py --profile canada-direct
