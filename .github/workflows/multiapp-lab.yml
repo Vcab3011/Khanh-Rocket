@@ -1,7 +1,7 @@
 name: Multi-App Lab Read-only Validation
 on:
   push:
-    branches: ["feature/multiapp-observability-v1"]
+    branches: ["feature/multiapp-*"]
   pull_request:
     paths:
       - "lab/**"
@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -22,7 +24,9 @@ jobs:
       - name: Install YAML parser for module schema validation
         run: python -m pip install PyYAML==6.0.2
       - name: Verify offline Egern build is deterministic
-        run: python lab/tools/build_runtime.py --check
+        run: |
+          python lab/tools/build_runtime.py --check
+          python lab/tools/audit_pins.py
       - name: Test app classification, privacy and runtime adapters
         run: node --test lab/tests/*.test.cjs
       - name: Validate independently installable Egern modules

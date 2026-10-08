@@ -10,27 +10,41 @@ const Core = /* Khanh Rocket Multi-App Lab v1: pure, read-only, zero-network ana
 (function () {
   "use strict";
   var SCHEMA = 1, MAX_EVENTS = 32, MAX_AGE_MS = 86400000, MAX_JSON = 262144;
-  function classify(url, ua) {
+  var SIGNALS = {locket:["customer-info","product-mapping"],soundcloud:["feature-config"],
+    youtube:["browse","next","search","player","get_watch","shorts"]};
+  var OUTCOMES = ["http-non200","opaque-protobuf","body-unavailable","body-too-large",
+    "invalid-json","unexpected-json","schema-mismatch","observed","encoded-body-skipped",
+    "invalid-utf8","content-type-skipped"];
+  var BODY_OUTCOMES = ["body-unavailable","body-too-large","encoded-body-skipped",
+    "invalid-utf8","content-type-skipped"];
+  function classify(url, ua, method) {
     if (typeof url !== "string") return null;
-    if (/^https:\/\/api\.revenuecat\.com\/v\d+\/(?:subscribers\/[^/?#]+|receipts)(?:[?#]|$)/i.test(url)) {
-      return typeof ua === "string" && /\bLocket\b/i.test(ua)
+    // Inspect only documented paths; hostname is case-insensitive, path is not.
+    var parts=url.match(/^https:\/\/([^/?#]+)(\/[^?#]*)(?:\?[^#]*)?(?:#.*)?$/i);
+    if(!parts)return null;
+    var host=parts[1].toLowerCase(),path=parts[2];
+    method=method===undefined?"GET":method;
+    if (host==="api.revenuecat.com" && /^\/v1\/(?:subscribers\/[^/]+|receipts)$/.test(path)) {
+      if(method!==(path==="/v1/receipts"?"POST":"GET"))return null;
+      return typeof ua === "string" && /^Locket(?:\/|\s|$)/i.test(ua)
         ? {app:"locket", signal:"customer-info", kind:"json"} : null;
     }
-    if (/^https:\/\/api\.revenuecat\.com\/v\d+\/product_entitlement_mapping(?:[?#]|$)/i.test(url)) {
-      return typeof ua === "string" && /\bLocket\b/i.test(ua)
+    if (host==="api.revenuecat.com" && path==="/v1/product_entitlement_mapping" && method==="GET") {
+      return typeof ua === "string" && /^Locket(?:\/|\s|$)/i.test(ua)
         ? {app:"locket", signal:"product-mapping", kind:"json"} : null;
     }
-    if (/^https:\/\/api-mobile\.soundcloud\.com\/configuration\/ios(?:[?#]|$)/i.test(url))
+    if (host==="api-mobile.soundcloud.com" && path==="/configuration/ios" && method==="GET")
       return {app:"soundcloud", signal:"feature-config", kind:"json"};
-    var match=url.match(/^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|search|player|get_watch|reel\/reel_watch_sequence)(?:[?#]|$)/i);
-    if(match) return {app:"youtube",signal:match[1].toLowerCase()==="reel/reel_watch_sequence"?"shorts":match[1].toLowerCase(),kind:"protobuf"};
+    var match=path.match(/^\/youtubei\/v1\/(browse|next|search|player|get_watch|reel\/reel_watch_sequence)$/);
+    if(host==="youtubei.googleapis.com" && method==="POST" && match)
+      return {app:"youtube",signal:match[1]==="reel/reel_watch_sequence"?"shorts":match[1],kind:"protobuf"};
     return null;
   }
   function object(v){return !!v && typeof v==="object" && !Array.isArray(v);}
   function number(n){return Number.isFinite(n) && n>=0 && n<=1e15;}
   function inspect(input) {
     if (!input || !object(input)) return null;
-    var route=classify(input.url,input.userAgent);
+    var route=classify(input.url,input.userAgent,input.method);
     if (!route) return null;
     var status=Number(input.status);
     if (!Number.isInteger(status) || status<100 || status>599) return null;
@@ -39,8 +53,20 @@ const Core = /* Khanh Rocket Multi-App Lab v1: pure, read-only, zero-network ana
     var event={v:SCHEMA,app:route.app,signal:route.signal,status:status,observedAt:now,format:route.kind};
     if (status!==200) {event.outcome="http-non200";return event;}
     if (route.kind==="protobuf") {event.outcome="opaque-protobuf";return event;}
+    if(BODY_OUTCOMES.indexOf(input.bodyOutcome)>=0){event.outcome=input.bodyOutcome;return event;}
     if (typeof input.body!=="string") {event.outcome="body-unavailable";return event;}
     if(input.body.length>MAX_JSON) {event.outcome="body-too-large";return event;}
+    // A character limit alone understates the size of multi-byte UTF-8 JSON.
+    var bytes=0;
+    for(var c=0;c<input.body.length;c++){
+      var ch=input.body.charCodeAt(c);
+      if(ch<128)bytes++;
+      else if(ch<2048)bytes+=2;
+      else if(ch>=0xd800 && ch<=0xdbff && c+1<input.body.length &&
+              input.body.charCodeAt(c+1)>=0xdc00 && input.body.charCodeAt(c+1)<=0xdfff){bytes+=4;c++;}
+      else bytes+=3;
+      if(bytes>MAX_JSON){event.outcome="body-too-large";return event;}
+    }
     var payload;
     try {payload=JSON.parse(input.body);}catch(_){event.outcome="invalid-json";return event;}
     if(!object(payload)) {event.outcome="unexpected-json";return event;}
@@ -71,6 +97,9 @@ const Core = /* Khanh Rocket Multi-App Lab v1: pure, read-only, zero-network ana
       return event;
     }
     if(route.signal==="feature-config") {
+      if(!object(payload.plan)||!Array.isArray(payload.features)){
+        event.outcome="schema-mismatch";return event;
+      }
       event.outcome="observed";
       event.planFieldPresent=object(payload.plan);
       event.featureCount=Array.isArray(payload.features)?Math.min(payload.features.length,4096):0;
@@ -82,14 +111,18 @@ const Core = /* Khanh Rocket Multi-App Lab v1: pure, read-only, zero-network ana
   }
   function compactEvent(e) {
     if (!object(e)||e.v!==SCHEMA||!number(e.observedAt))return null;
-    if (["locket","youtube","soundcloud"].indexOf(e.app)<0)return null;
-    if(typeof e.signal!=="string"||!/^[-a-z_]{1,40}$/.test(e.signal))return null;
+    if(!Object.prototype.hasOwnProperty.call(SIGNALS,e.app)||SIGNALS[e.app].indexOf(e.signal)<0)return null;
+    if(OUTCOMES.indexOf(e.outcome)<0)return null;
+    if(e.format!==(e.app==="youtube"?"protobuf":"json"))return null;
     if(!Number.isInteger(e.status)||e.status<100||e.status>599)return null;
     var result={v:1,app:e.app,signal:e.signal,status:e.status,observedAt:e.observedAt,
-      format:e.format==="json"?"json":"protobuf",outcome:String(e.outcome||"unknown").slice(0,40)};
-    var flags=["goldFieldPresent","goldExpiryFieldPresent","planFieldPresent"];
+      format:e.format,outcome:e.outcome};
+    var flags=e.outcome!=="observed"?[]:e.app==="locket" && e.signal==="customer-info"
+      ? ["goldFieldPresent","goldExpiryFieldPresent"]:e.app==="soundcloud"?["planFieldPresent"]:[];
     for(var i=0;i<flags.length;i++)if(typeof e[flags[i]]==="boolean")result[flags[i]]=e[flags[i]];
-    var counts=["entitlementCount","productCount","mappingEntryCount","featureCount","enabledFeatureCount"];
+    var counts=e.outcome!=="observed"?[]:e.app==="locket"
+      ? (e.signal==="customer-info"?["entitlementCount"]:["productCount","mappingEntryCount"])
+      :e.app==="soundcloud"?["featureCount","enabledFeatureCount"]:[];
     for(var j=0;j<counts.length;j++)if(Number.isInteger(e[counts[j]])&&e[counts[j]]>=0)
       result[counts[j]]=Math.min(8192,e[counts[j]]);
     return result;
@@ -109,10 +142,16 @@ const Core = /* Khanh Rocket Multi-App Lab v1: pure, read-only, zero-network ana
   }
   function summary(history,now) {
     var rows=append(history,null,now),apps={locket:0,soundcloud:0,youtube:0};
-    for(var i=0;i<rows.length;i++)apps[rows[i].app]++;
-    var latest=rows.length?rows[rows.length-1]:null;
+    var latest=null,bodyUnavailable=0,schemaDrift=0;
+    for(var i=0;i<rows.length;i++){
+      apps[rows[i].app]++;
+      if(!latest || rows[i].observedAt>=latest.observedAt)latest=rows[i];
+      if(rows[i].outcome==="body-unavailable")bodyUnavailable++;
+      if(["schema-mismatch","unexpected-json"].indexOf(rows[i].outcome)>=0)schemaDrift++;
+    }
     return {eventCount:rows.length,apps:apps,lastObservedAt:latest?latest.observedAt:null,
-      lastApp:latest?latest.app:null,lastOutcome:latest?latest.outcome:null};
+      lastApp:latest?latest.app:null,lastOutcome:latest?latest.outcome:null,
+      bodyUnavailable:bodyUnavailable,schemaDrift:schemaDrift};
   }
   return {classify:classify,inspect:inspect,compactEvent:compactEvent,append:append,
     summary:summary,MAX_JSON:MAX_JSON,MAX_EVENTS:MAX_EVENTS,MAX_AGE_MS:MAX_AGE_MS};
@@ -120,42 +159,64 @@ const Core = /* Khanh Rocket Multi-App Lab v1: pure, read-only, zero-network ana
 const KEY = "khanh.multiapp.events.v1";
 const LIMIT = 262144;
 export default async function(ctx) {
+  // Keep restoration state outside diagnostics so storage/decoder exceptions
+  // cannot discard a successfully consumed response stream.
+  let originalBytes;
   try {
     if (!ctx || !ctx.request || !ctx.response) return;
     const req=ctx.request,resp=ctx.response,head=req.headers;
     const userAgent=head && typeof head.get==="function"
       ? (head.get("user-agent") || "") : "";
-    const route=Core.classify(req.url,userAgent);
+    if(typeof req.method!=="string")return;
+    const route=Core.classify(req.url,userAgent,req.method);
     if(!route)return;
     const status=Number(resp.status);
     if(!Number.isInteger(status))return;
     // Do not read opaque protobuf bytes. Metadata is enough for YouTube
     // endpoint analytics; all player data remains untouched.
-    let body, originalBytes;
+    let body, bodyOutcome;
     if(route.kind==="json" && status===200) {
-      const contentType=resp.headers && typeof resp.headers.get==="function"
-        ? (resp.headers.get("content-type")||"") : "";
-      if(contentType && !/\bjson\b|\+json/i.test(contentType))return;
-      if(typeof resp.arrayBuffer!=="function")return;
-      const buf=await resp.arrayBuffer();
-      originalBytes=new Uint8Array(buf);
-      if(originalBytes.byteLength<=LIMIT && typeof TextDecoder==="function")
-        body=new TextDecoder("utf-8").decode(originalBytes);
-      // Oversized input is retained byte-for-byte but not JSON-decoded.
+      if(!resp.headers || typeof resp.headers.get!=="function"){
+        bodyOutcome="body-unavailable";
+      }else{
+        const contentType=(resp.headers.get("content-type")||"").split(";")[0].trim();
+        const encoding=(resp.headers.get("content-encoding")||"").trim().toLowerCase();
+        const length=resp.headers.get("content-length");
+        // Runtime decompression/recompression semantics are not device-verified.
+        // Leave encoded streams and all their headers untouched.
+        if(encoding && encoding!=="identity")bodyOutcome="encoded-body-skipped";
+        else if(!/^application\/(?:json|[a-z0-9!#$&^_.+-]+\+json)$/i.test(contentType))
+          bodyOutcome="content-type-skipped";
+        else if(length && /^\d+$/.test(length) && Number(length)>LIMIT)
+          bodyOutcome="body-too-large";
+        else if(resp.body===null || typeof resp.arrayBuffer!=="function" || resp.bodyUsed || typeof TextDecoder!=="function")
+          bodyOutcome="body-unavailable";
+        else{
+          try{
+            const buf=await resp.arrayBuffer();
+            originalBytes=new Uint8Array(buf);
+            if(originalBytes.byteLength>LIMIT)bodyOutcome="body-too-large";
+            else{
+              try{body=new TextDecoder("utf-8",{fatal:true}).decode(originalBytes);}
+              catch(_){bodyOutcome="invalid-utf8";}
+            }
+          }catch(_){bodyOutcome="body-unavailable";}
+        }
+      }
     }
     const now=Date.now();
-    const event=Core.inspect({url:req.url,userAgent,status,now,body});
+    const event=Core.inspect({url:req.url,userAgent,method:req.method,status,now,body,bodyOutcome});
     if(event && ctx.storage && typeof ctx.storage.getJSON==="function" &&
        typeof ctx.storage.setJSON==="function") {
       let prev=[];
       try {prev=ctx.storage.getJSON(KEY);}catch(_){}
       ctx.storage.setJSON(KEY,Core.append(prev,event,now));
     }
-    // Egern response body is one-shot: restore its original bytes verbatim.
-    // This avoids text re-encoding and preserves an opaque compressed payload.
-    if(originalBytes)return {body:originalBytes};
   } catch (_) {
     // No remote reporting, headers/URL/account logging, or notifications.
-    return;
+  } finally {
+    // Return even when diagnostics throw, retaining status/headers implicitly.
+    // This preserves JS-visible bytes, not a claim about iOS wire fidelity.
+    if(originalBytes)return {body:originalBytes};
   }
 }

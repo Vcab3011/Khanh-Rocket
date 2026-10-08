@@ -6,42 +6,64 @@ const Core = __KHANH_CORE__;
 const KEY = "khanh.multiapp.events.v1";
 const LIMIT = 262144;
 export default async function(ctx) {
+  // Keep restoration state outside diagnostics so storage/decoder exceptions
+  // cannot discard a successfully consumed response stream.
+  let originalBytes;
   try {
     if (!ctx || !ctx.request || !ctx.response) return;
     const req=ctx.request,resp=ctx.response,head=req.headers;
     const userAgent=head && typeof head.get==="function"
       ? (head.get("user-agent") || "") : "";
-    const route=Core.classify(req.url,userAgent);
+    if(typeof req.method!=="string")return;
+    const route=Core.classify(req.url,userAgent,req.method);
     if(!route)return;
     const status=Number(resp.status);
     if(!Number.isInteger(status))return;
     // Do not read opaque protobuf bytes. Metadata is enough for YouTube
     // endpoint analytics; all player data remains untouched.
-    let body, originalBytes;
+    let body, bodyOutcome;
     if(route.kind==="json" && status===200) {
-      const contentType=resp.headers && typeof resp.headers.get==="function"
-        ? (resp.headers.get("content-type")||"") : "";
-      if(contentType && !/\bjson\b|\+json/i.test(contentType))return;
-      if(typeof resp.arrayBuffer!=="function")return;
-      const buf=await resp.arrayBuffer();
-      originalBytes=new Uint8Array(buf);
-      if(originalBytes.byteLength<=LIMIT && typeof TextDecoder==="function")
-        body=new TextDecoder("utf-8").decode(originalBytes);
-      // Oversized input is retained byte-for-byte but not JSON-decoded.
+      if(!resp.headers || typeof resp.headers.get!=="function"){
+        bodyOutcome="body-unavailable";
+      }else{
+        const contentType=(resp.headers.get("content-type")||"").split(";")[0].trim();
+        const encoding=(resp.headers.get("content-encoding")||"").trim().toLowerCase();
+        const length=resp.headers.get("content-length");
+        // Runtime decompression/recompression semantics are not device-verified.
+        // Leave encoded streams and all their headers untouched.
+        if(encoding && encoding!=="identity")bodyOutcome="encoded-body-skipped";
+        else if(!/^application\/(?:json|[a-z0-9!#$&^_.+-]+\+json)$/i.test(contentType))
+          bodyOutcome="content-type-skipped";
+        else if(length && /^\d+$/.test(length) && Number(length)>LIMIT)
+          bodyOutcome="body-too-large";
+        else if(resp.body===null || typeof resp.arrayBuffer!=="function" || resp.bodyUsed || typeof TextDecoder!=="function")
+          bodyOutcome="body-unavailable";
+        else{
+          try{
+            const buf=await resp.arrayBuffer();
+            originalBytes=new Uint8Array(buf);
+            if(originalBytes.byteLength>LIMIT)bodyOutcome="body-too-large";
+            else{
+              try{body=new TextDecoder("utf-8",{fatal:true}).decode(originalBytes);}
+              catch(_){bodyOutcome="invalid-utf8";}
+            }
+          }catch(_){bodyOutcome="body-unavailable";}
+        }
+      }
     }
     const now=Date.now();
-    const event=Core.inspect({url:req.url,userAgent,status,now,body});
+    const event=Core.inspect({url:req.url,userAgent,method:req.method,status,now,body,bodyOutcome});
     if(event && ctx.storage && typeof ctx.storage.getJSON==="function" &&
        typeof ctx.storage.setJSON==="function") {
       let prev=[];
       try {prev=ctx.storage.getJSON(KEY);}catch(_){}
       ctx.storage.setJSON(KEY,Core.append(prev,event,now));
     }
-    // Egern response body is one-shot: restore its original bytes verbatim.
-    // This avoids text re-encoding and preserves an opaque compressed payload.
-    if(originalBytes)return {body:originalBytes};
   } catch (_) {
     // No remote reporting, headers/URL/account logging, or notifications.
-    return;
+  } finally {
+    // Return even when diagnostics throw, retaining status/headers implicitly.
+    // This preserves JS-visible bytes, not a claim about iOS wire fidelity.
+    if(originalBytes)return {body:originalBytes};
   }
 }

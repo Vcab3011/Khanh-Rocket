@@ -13,7 +13,7 @@ const lock="https://api.revenuecat.com/v1/subscribers/user123";
 const sound="https://api-mobile.soundcloud.com/configuration/ios";
 const yt="https://youtubei.googleapis.com/youtubei/v1/";
 function inspect(url,body,userAgent="",status=200,clock=now){
-  return Core.inspect({url,body,userAgent,status,now:clock});
+  return Core.inspect({url,body,userAgent,status,now:clock,method:url.startsWith(yt)?"POST":"GET"});
 }
 function own(value){return JSON.parse(JSON.stringify(value));}
 function assertSafe(value){
@@ -34,7 +34,7 @@ test("strict app classification rejects unrelated hosts, path ambiguity, fake su
  assert.equal(Core.classify(lock,"Locket/1").app,"locket");
  assert.equal(Core.classify(sound).app,"soundcloud");
  for(const endpoint of ["player","browse","next","search","get_watch","reel/reel_watch_sequence"]){
-  assert.equal(Core.classify(yt+endpoint).app,"youtube");
+  assert.equal(Core.classify(yt+endpoint,"","POST").app,"youtube");
  }
 });
 test("RevenueCat CustomerInfo captures only entitlement count and presence not subscriber identity",()=>{
@@ -120,4 +120,34 @@ test("no direct network, persistence API, dynamic evaluation or console in pure 
  for(const keyword of ["fetch(", "$httpClient", "$task.fetch", "ctx.http", "console.", "eval(", "Function(", "persistentStore", "storage."]){
   assert.equal(code.includes(keyword),false,keyword);
  }
+});
+test("event-store enums reject identifiers hidden in signal/outcome and cross-app fields",()=>{
+ const safe=inspect(lock,JSON.stringify(customer),"Locket");
+ for(const change of [{signal:"synthetic-account"},{outcome:"bearer-secret"},
+   {signal:"feature-config"},{format:"protobuf"},{app:"__proto__"}]){
+  assert.equal(Core.compactEvent({...safe,...change}),null);
+ }
+ const youtube=inspect(yt+"player",undefined);
+ const result=own(Core.compactEvent({...youtube,goldFieldPresent:true,entitlementCount:99,
+  fullURL:lock,authorization:"bearer-secret",receipt:"receipt_payload",body:"customer_user_id"}));
+ assert.deepEqual(Object.keys(result).sort(),["v","app","signal","status","observedAt","format","outcome"].sort());
+ assertSafe(result);
+});
+test("UTF-8 byte cap applies even when character count is below the limit",()=>{
+ const body=JSON.stringify({subscriber:{entitlements:{},padding:"é".repeat(140000)}});
+ assert.ok(body.length<262144);assert.ok(Buffer.byteLength(body)>262144);
+ assert.equal(inspect(lock,body,"Locket").outcome,"body-too-large");
+});
+test("unknown SoundCloud schema is reported instead of counted as a valid empty config",()=>{
+ for(const payload of [{},{plan:{}},{features:[]},{plan:[],features:[]},{plan:{},features:{}}])
+  assert.equal(inspect(sound,JSON.stringify(payload)).outcome,"schema-mismatch");
+});
+test("summary uses maximum capture time and counts only retained unavailable/schema events",()=>{
+ const first=inspect(lock,"{}","Locket",200,now);
+ const older=inspect(lock,undefined,"Locket",200,now-1);
+ const expired={...older,observedAt:now-86400001};
+ const summary=own(Core.summary([first,older,expired],now));
+ assert.equal(summary.lastObservedAt,now);assert.equal(summary.lastOutcome,"schema-mismatch");
+ assert.equal(summary.schemaDrift,1);assert.equal(summary.bodyUnavailable,1);
+ assert.equal(Core.summary([{...first,outcome:"synthetic-account"}],now).eventCount,0);
 });

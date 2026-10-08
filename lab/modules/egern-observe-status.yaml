@@ -5,6 +5,6 @@ homepage: "https://github.com/Vcab3011/Khanh-Rocket"
 scriptings:
   - generic:
       name: "Khanh Multi-App Status"
-      script_url: "https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/64e4a8ff606a329ca6bedc750f8bed58c590feb6/lab/build/egern-status.js"
+      script_url: "https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/f9c72dff2a4f92e7c93a9c1a44777e286f0a5ea3/lab/build/egern-status.js"
       timeout: 10
       update_interval: 86400

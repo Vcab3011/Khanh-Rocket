@@ -55,7 +55,11 @@ Only:
 
 Never persist request URL, account ID, User-Agent, authorization, receipt, JWT, response body, song/video details, original subscriber JSON or product names. Maximum 32 local events, 24-hour sliding TTL, no outbound logging/telemetry. Manually clear by running the reset module. **The experimental feature does not and cannot certify legitimate purchases.**
 
-The Egern adapter reads the response as an ArrayBuffer and returns the original **bytes** in `{body}` after analysis; for YouTube it does not consume the protobuf stream. This preserves the byte representation made available by Egern, although **header/compression interoperability and real device behavior are not yet validated**.
+The Egern adapter reads only HTTP 200 JSON bodies with absent/identity Content-Encoding and returns the original **bytes** in `{body}` even if diagnostics or storage throws. Encoded bodies (gzip/br/deflate), non-JSON MIME types, missing bodies, non-200 statuses and YouTube protobuf are left unread. A declared Content-Length above 256 KiB is skipped before reading; an unexpectedly larger stream is restored without decoding. Invalid UTF-8 is reported without silently replacing characters. This preserves the byte representation made available by Egern, although **header/compression interoperability and real device behavior are not yet validated**. A rejected stream read cannot be reconstructed when the runtime supplies no bytes.
+
+Only documented v1 RevenueCat GET subscribers / POST receipts and GET mapping routes are classified; SoundCloud requires GET and YouTube requires POST. Locket must be the first User-Agent token (`Locket/…` or `Locket …`). This deliberately rejects ambiguous identities and unknown API versions; User-Agent is a routing hint, not authenticated app identity. Status/outcome/signal enums and app-specific metric keys are allowlisted, including when reading old local history.
+
+The widget shows last capture, `bodyUnavailable` and `schemaDrift` counts **within retained history**, plus manual experiment checkpoints. These are diagnostic outcomes, not entitlement validity or lifetime request totals. An empty/changed SoundCloud plan/features schema is reported as schema drift. No arbitrary notes or VPN-off claims are saved by scripts.
 
 ### One-shot experiment checklist
 
@@ -76,7 +80,7 @@ A visible Gold badge after VPN disconnection could reflect app cache, UI state o
 - `lab/core/observer-core.js`: pure dependency-free app route registry, schema-limited inspectors, allowlisted event sanitizer, 24h/32-event retention, summary.
 - `lab/runtime/egern-observer.template.js`: Egern native adapter (single stream read; byte restoration; `ctx.storage` only).
 - `lab/runtime/egern-status.template.js`: optional generic widget.
-- `lab/tools/build_runtime.py`: deterministic offline generation; bundle core into stand-alone JS. No runtime imports from third-party packages.
+- `lab/tools/build_runtime.py`: deterministic offline generation for observer/status/reset; bundle core into stand-alone JS. No runtime imports from third-party packages.
 - `lab/build/`: generated audited JS with pinned commit URL in module YAML.
 - `lab/tests/`: fake synthetic app/API fixtures, malicious-URL and privacy checks; no real receipts required.
 - Shadowrocket V3 production or canary scripts are **not modified** by this lab. A future optional read-only Shadowrocket diagnostics adapter can reuse the pure core but must have independent tests for `$done`, `bodyBytes` and storage.
@@ -90,11 +94,22 @@ python -m pip install PyYAML==6.0.2
 node --test lab/tests/*.test.cjs
 python -m unittest discover -s lab/tests -p "test_*.py" -v
 python lab/tools/build_runtime.py --check
+python lab/tools/audit_pins.py
 python tools/validate_legacy.py
 python native/v3/audit_supply_chain.py
 ```
 
 Automated tests validate code and module structural syntax; they cannot prove Egern's runtime MITM behavior. Keep Egern source and features isolated until primary functions have been verified on a spare iPhone. No merges into production without explicit user approval.
+
+## P1 runtime evidence and remaining debt
+
+Official API/configuration documentation rechecked on 2026-10-08: [JavaScript API](https://egernapp.com/docs/javascript-api/), [Scriptings](https://egernapp.com/docs/configuration/scriptings/), [Modules](https://egernapp.com/docs/configuration/modules/). The documented contract supports one-shot `arrayBuffer()`, case-insensitive `Headers.get`, synchronous `getJSON/setJSON/delete`, `Uint8Array` response bodies with omitted fields unchanged, and generic widget returns. `max_size` limits bodies supplied to scripts; `binary_body` enables binary handling. No documentation guarantee was found for wire-level decompression/recompression or timeout rollback after consumption.
+
+Tests cover both minimal synthetic contexts and Node's real Fetch `Response`/`Headers`. Neither executes Egern's JavaScript engine. Before a spare-device pilot, verify module import, binary return behavior, status/Content-Type/Content-Length/Content-Encoding, missing/max-size body behavior, response timing, and widget rendering on the exact Egern version. Keep the existing Shadowrocket V3 profile and its YouTube player pin unchanged.
+
+Remaining debt: shared local storage updates are read/append/write without documented atomic transactions, so concurrent captures can lose a metadata event; 32-event history is diagnostic sampling, not complete traffic accounting. TTL removes expired events on the next append and filters widget reads; an idle device does not automatically erase persisted metadata, so use manual reset after an experiment. Product mapping is a pure classifier but is not hooked by the current Locket module. Automatic experiment scheduling, backend entitlement verification, arbitrary app adapters and production promotion remain outside this patch.
+
+`lab/supply-chain-lock.json` records exact first-party commit refs, Git blob IDs and SHA-256 for observer, status and reset. `audit_pins.py` checks all five module URLs against that inventory and compares local bundles to the actual pinned Git bytes offline (full history required). The build check includes the reset template. For an intentional code update: build and test first, commit the reviewed bundle bytes, then update pins/lock in a separate commit; never pin a mutable branch or silently refresh a protected baseline. JSON observers opt into documented `binary_body: true` for byte handling. These source checks do not attest bytes downloaded by Egern on a device.
 
 ## Attribution
 

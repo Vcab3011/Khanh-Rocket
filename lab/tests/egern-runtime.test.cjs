@@ -16,7 +16,7 @@ function mock({url=locket,ua="Locket iOS",body='{"subscriber":{"entitlements":{"
  const db=new Map(),calls={reads:0,writes:0,gets:0};
  const headers={get:(name)=>name.toLowerCase()==="user-agent"?ua:null};
  const ctx={
-   request:{url,headers},
+   request:{url,headers,method:url===yt?"POST":"GET"},
    response:{status,headers:{get:(name)=>name.toLowerCase()==="content-type"?contentType:null},
      arrayBuffer:async()=>{calls.reads++;if(calls.reads>1)throw Error("stream consumed twice");return Uint8Array.from(Buffer.from(body,"utf8")).buffer}},
    storage:{getJSON:(key)=>{calls.gets++;return db.get(key)},
@@ -87,6 +87,14 @@ test("Egern missing storage and malformed storage fail quietly",async()=>{
  assert.equal(Buffer.from((await f(m.ctx)).body).toString("utf8"),m.body);
  const widget=await load("egern-status");
  assert.equal((await widget(m.ctx)).type,"widget");
+});
+test("storage failure after stream consumption still restores exact bytes",async()=>{
+ const f=await load("egern-observer"),m=mock();
+ m.ctx.storage.setJSON=()=>{throw Error("synthetic storage failure")};
+ const result=await f(m.ctx);
+ assert.ok(result && result.body,"consumed response must be restored on exception");
+ assert.equal(Buffer.from(result.body).toString("utf8"),m.body);
+ assert.equal(m.calls.reads,1);
 });
 test("no external network, synthetic purchases, or raw response storage in Egern bundle",()=>{
  const source=fs.readFileSync(path.join(root,"build/egern-observer.js"),"utf8");
