@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "captured_on": "2026-10-08",
+  "status": "research-only",
+  "assumptions": [
+    "No verified API endpoints for either app are used.",
+    "Feature visibility is not proof of a paid subscription.",
+    "The official service controls server storage, privacy, limits, and entitlements.",
+    "No HTTP MITM, purchase-receipt modification, or authentication bypass is included."
+  ],
+  "apps": {
+    "snapchat_plus": {
+      "display_name": "Snapchat+",
+      "product_family": "Snap Inc. Snapchat+",
+      "official_sources": [
+        "https://help.snapchat.com/hc/en-us/articles/7121577610900-What-is-Snapchat?enableDeviceSpecificMedia=rvhv2%27&lang=en-US",
+        "https://help.snapchat.com/hc/en-us/articles/41291271694228-How-do-I-manage-my-Memories-storage"
+      ],
+      "features": [
+        {
+          "key": "custom_app_icon",
+          "label": "Custom App Icon",
+          "control": "ui-with-account-gate"
+        },
+        {
+          "key": "chat_wallpapers",
+          "label": "Chat Wallpapers",
+          "control": "ui-with-account-gate"
+        },
+        {
+          "key": "bitmoji_pet_car",
+          "label": "Bitmoji Pet & Car",
+          "control": "ui-with-account-gate"
+        },
+        {
+          "key": "story_boost",
+          "label": "Story Boost",
+          "control": "server-social"
+        },
+        {
+          "key": "story_rewatch",
+          "label": "Story Rewatch",
+          "control": "server-social"
+        },
+        {
+          "key": "memories_250gb",
+          "label": "250 GB Memories",
+          "control": "server-storage"
+        },
+        {
+          "key": "ai_tools",
+          "label": "AI Creative Tools",
+          "control": "server-account"
+        },
+        {
+          "key": "platinum_ads",
+          "label": "Platinum Story/Lens Ad Benefit",
+          "control": "server-account"
+        }
+      ]
+    },
+    "instagram_plus": {
+      "display_name": "Instagram Plus",
+      "product_family": "Meta Instagram Plus (not Meta Verified)",
+      "sources": [
+        "https://techcrunch.com/2026/05/27/meta-officially-launches-instagram-facebook-and-whatsapp-subscriptions-with-more-to-come-including-ai-plans/",
+        "https://www.cbsnews.com/news/meta-instagram-plus-399-new-features/"
+      ],
+      "features": [
+        {
+          "key": "custom_app_icon",
+          "label": "Custom App Icon",
+          "control": "ui-with-account-gate"
+        },
+        {
+          "key": "bio_fonts",
+          "label": "Bio Font Customization",
+          "control": "ui-with-account-gate"
+        },
+        {
+          "key": "additional_pins",
+          "label": "More Profile Pins",
+          "control": "server-social"
+        },
+        {
+          "key": "story_extend",
+          "label": "Story Extend to 48 Hours",
+          "control": "server-social"
+        },
+        {
+          "key": "story_spotlight",
+          "label": "Story Spotlight",
+          "control": "server-social"
+        },
+        {
+          "key": "story_rewatch_count",
+          "label": "Story Rewatch Aggregate",
+          "control": "server-social"
+        },
+        {
+          "key": "story_audience_lists",
+          "label": "Multiple Story Audience Lists",
+          "control": "server-social"
+        },
+        {
+          "key": "story_preview",
+          "label": "Story Preview/Anonymity",
+          "control": "server-privacy"
+        },
+        {
+          "key": "story_viewer_search",
+          "label": "Search Story Viewer List",
+          "control": "server-social"
+        },
+        {
+          "key": "story_super_hearts",
+          "label": "Animated Super Hearts",
+          "control": "server-social"
+        },
+        {
+          "key": "profile_only_posts",
+          "label": "Post to Profile Without Main Feed",
+          "control": "server-social"
+        }
+      ]
+    }
+  }
+}
