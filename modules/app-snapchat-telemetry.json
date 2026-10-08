@@ -1,0 +1,12 @@
+{
+  "name": "app-snapchat-telemetry",
+  "kind": "domain-rules",
+  "app": "Snapchat",
+  "category": "snapchat",
+  "status": "experimental; not device-tested",
+  "default_enabled": false,
+  "description": "Blocks selected analytics endpoint (requires device validation)",
+  "rules": [
+    "DOMAIN,sc-analytics.appspot.com,REJECT"
+  ]
+}

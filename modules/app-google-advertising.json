@@ -1,0 +1,12 @@
+{
+  "name": "app-google-advertising",
+  "kind": "domain-rules",
+  "app": "Google",
+  "category": "google",
+  "status": "experimental; not device-tested",
+  "default_enabled": false,
+  "description": "Blocks selected ad conversion domain",
+  "rules": [
+    "DOMAIN-SUFFIX,googleadservices.com,REJECT"
+  ]
+}

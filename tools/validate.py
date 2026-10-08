@@ -1,43 +1,60 @@
 #!/usr/bin/env python3
-"""Static check for Khanh Rocket's intentionally small .conf subset."""
+"""Fail closed on unexpected syntax in generated Shadowrocket rulesets."""
+import ipaddress
+import re
 import sys
 from pathlib import Path
 
-ALLOWED = {"DIRECT", "PROXY", "REJECT"}
+DOMAIN = re.compile(r'^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$')
+FORBIDDEN_SECTIONS = {'[script]', '[mitm]', '[url rewrite]', '[header rewrite]', '[map local]', '[body rewrite]'}
 
-def validate(path: Path) -> list[str]:
-    text = path.read_text(encoding="utf-8")
-    errors = []
-    if any(k in text.lower() for k in ("[script]", "[mitm]", "[url rewrite]", "[header rewrite]")):
-        errors.append("active script/MITM/rewrite sections are forbidden in baseline")
-    lines = [line.strip() for line in text.splitlines() if line.strip() and not line.strip().startswith("#")]
-    if lines.count("[Rule]") != 1:
-        errors.append("expected one [Rule] section")
-    rules = [ln for ln in lines if not ln.startswith("[")]
-    finals = [i for i, ln in enumerate(rules) if ln.startswith("FINAL,")]
-    if finals != [len(rules)-1]:
-        errors.append("exactly one FINAL rule must be last")
-    for line in rules:
-        fields = [f.strip() for f in line.split(",")]
-        typ = fields[0]
-        if typ == "FINAL":
-            if len(fields) != 2 or fields[-1] not in {"DIRECT", "PROXY"}:
-                errors.append(f"invalid final rule: {line}")
-        elif typ == "DOMAIN-SUFFIX":
-            if len(fields) != 3 or fields[2] not in ALLOWED or not fields[1]:
-                errors.append(f"invalid domain rule: {line}")
-        elif typ == "IP-CIDR":
-            if len(fields) != 4 or fields[2] != "DIRECT" or fields[3] != "no-resolve":
-                errors.append(f"invalid private-network exception: {line}")
+
+def validate_text(content: str):
+    problems = []
+    lines = [s.strip() for s in content.splitlines() if s.strip() and not s.strip().startswith('#')]
+    sections = [s for s in lines if s.startswith('[')]
+    if sections != ['[Rule]']:
+        problems.append('expected a single [Rule] section and no other sections')
+    if any(s.lower() in FORBIDDEN_SECTIONS for s in sections):
+        problems.append('interception / script sections are not allowed')
+    rules = [s for s in lines if not s.startswith('[')]
+    final_positions = [i for i, s in enumerate(rules) if s.startswith('FINAL,')]
+    if final_positions != [len(rules)-1]:
+        problems.append('exactly one FINAL must be last')
+    for rule in rules:
+        args = rule.split(',')
+        typ = args[0]
+        if typ == 'FINAL':
+            if len(args) != 2 or args[1] not in ('DIRECT', 'PROXY'):
+                problems.append('bad FINAL: '+rule)
+        elif typ in ('DOMAIN', 'DOMAIN-SUFFIX'):
+            if len(args) != 3 or not DOMAIN.fullmatch(args[1]) or args[2] not in ('DIRECT', 'PROXY', 'REJECT'):
+                problems.append('bad domain rule: '+rule)
+        elif typ == 'IP-CIDR':
+            if len(args) != 4 or args[2] != 'DIRECT' or args[3] != 'no-resolve':
+                problems.append('bad IP-CIDR: '+rule)
+            else:
+                try:
+                    if not ipaddress.ip_network(args[1]).is_private:
+                        problems.append('non-private DIRECT CIDR: '+rule)
+                except ValueError:
+                    problems.append('bad CIDR: '+rule)
         else:
-            errors.append(f"unsupported rule: {line}")
-    return errors
+            problems.append('unsupported rule: '+rule)
+    if len(rules) != len(set(rules)):
+        problems.append('duplicate rules')
+    return problems
 
-if __name__ == "__main__":
+
+def validate(path: Path):
+    return validate_text(path.read_text(encoding='utf-8'))
+
+
+if __name__ == '__main__':
     if len(sys.argv) != 2:
-        raise SystemExit("usage: python tools/validate.py build/<name>.conf")
-    problems = validate(Path(sys.argv[1]))
-    if problems:
-        print("FAIL:\n- " + "\n- ".join(problems))
+        raise SystemExit('usage: python tools/validate.py build/filename.conf')
+    faults = validate(Path(sys.argv[1]))
+    if faults:
+        print('FAIL:\n- ' + '\n- '.join(faults))
         raise SystemExit(1)
-    print("PASS: configuration passes baseline static checks")
+    print('PASS: static validation succeeded')

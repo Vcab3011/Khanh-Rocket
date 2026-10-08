@@ -1,0 +1,12 @@
+{
+  "name": "app-microsoft-telemetry",
+  "kind": "domain-rules",
+  "app": "Microsoft",
+  "category": "microsoft",
+  "status": "experimental; not device-tested",
+  "default_enabled": false,
+  "description": "Blocks selected Windows/Microsoft diagnostic endpoint",
+  "rules": [
+    "DOMAIN,vortex.data.microsoft.com,REJECT"
+  ]
+}

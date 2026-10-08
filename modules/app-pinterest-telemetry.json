@@ -1,0 +1,12 @@
+{
+  "name": "app-pinterest-telemetry",
+  "kind": "domain-rules",
+  "app": "Pinterest",
+  "category": "pinterest",
+  "status": "experimental; not device-tested",
+  "default_enabled": false,
+  "description": "Blocks Pinterest log events endpoint",
+  "rules": [
+    "DOMAIN,log.pinterest.com,REJECT"
+  ]
+}

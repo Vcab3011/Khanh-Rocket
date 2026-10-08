@@ -1,0 +1,12 @@
+{
+  "name": "app-youtube-telemetry",
+  "kind": "domain-rules",
+  "app": "YouTube",
+  "category": "youtube",
+  "status": "experimental; not device-tested",
+  "default_enabled": false,
+  "description": "Blocks selected analytics endpoint; can affect viewing metrics",
+  "rules": [
+    "DOMAIN,s.youtube.com,REJECT"
+  ]
+}

@@ -37,3 +37,7 @@ python -m unittest discover -s tests -v
 - Independent dynamic testing is needed; passing static checks does not guarantee Shadowrocket compatibility.
 
 Source reviewed: https://github.com/Gaucuto/ver2promax/blob/main/10in1 at commit `70a1343587324ff5a17195d8847ce55001f9ed44`.
+
+## Phase 2 preview (experimental)
+
+A draft update is available on branch `feature/phase2-modular-app-rules`: 12 opt-in app-specific domain filters, a deterministic rules compiler, stricter linting, iPad test notes, and [original 10in1 feature parity audit](docs/PHASE2.md). These are privacy/ad-network controls **not** Premium unlocks; third-party subscription scripts remain audit-only. Import `build/apps-privacy.conf` from the preview branch on a test device.

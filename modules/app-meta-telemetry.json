@@ -1,0 +1,12 @@
+{
+  "name": "app-meta-telemetry",
+  "kind": "domain-rules",
+  "app": "Meta/Facebook",
+  "category": "meta",
+  "status": "experimental; not device-tested",
+  "default_enabled": false,
+  "description": "Blocks an analytics domain only; cannot disable every tracker",
+  "rules": [
+    "DOMAIN,an.facebook.com,REJECT"
+  ]
+}

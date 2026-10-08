@@ -1,0 +1,12 @@
+{
+  "name": "app-amazon-ads",
+  "kind": "domain-rules",
+  "app": "Amazon",
+  "category": "amazon",
+  "status": "experimental; not device-tested",
+  "default_enabled": false,
+  "description": "Blocks Amazon advertising network domain, not all sponsored listings",
+  "rules": [
+    "DOMAIN-SUFFIX,amazon-adsystem.com,REJECT"
+  ]
+}

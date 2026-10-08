@@ -1,0 +1,12 @@
+{
+  "name": "app-twitch-telemetry",
+  "kind": "domain-rules",
+  "app": "Twitch",
+  "category": "twitch",
+  "status": "experimental; not device-tested",
+  "default_enabled": false,
+  "description": "Blocks Twitch telemetry endpoint; not Twitch Turbo",
+  "rules": [
+    "DOMAIN,spade.twitch.tv,REJECT"
+  ]
+}

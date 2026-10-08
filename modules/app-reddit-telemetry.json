@@ -1,0 +1,12 @@
+{
+  "name": "app-reddit-telemetry",
+  "kind": "domain-rules",
+  "app": "Reddit",
+  "category": "reddit",
+  "status": "experimental; not device-tested",
+  "default_enabled": false,
+  "description": "Blocks a known events telemetry hostname, not Reddit Premium",
+  "rules": [
+    "DOMAIN,events.redditmedia.com,REJECT"
+  ]
+}
