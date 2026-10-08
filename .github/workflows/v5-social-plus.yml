@@ -1,0 +1,31 @@
+name: V5 Social Plus Research Validation
+on:
+  push:
+    branches: ["feature/v5-social-plus-research"]
+  pull_request:
+    paths:
+      - "native/v5/**"
+      - ".github/workflows/v5-social-plus.yml"
+permissions:
+  contents: read
+jobs:
+  offline-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify Snapchat+ and Instagram Plus independent feature-state model
+        run: node --test native/v5/tests/*.test.cjs
+      - name: Validate unchanged V1 production baseline
+        run: python tools/validate_legacy.py
+      - name: Check V4 release candidate has not been changed
+        run: |
+          test "$(git rev-parse HEAD:native/v4/build/caption-canary.conf)" = "c0de4cad7b85361e2e5a70913aeabe0f1a911e31"
+          test "$(git rev-parse HEAD:build/khanh-rocket-v3-test.conf)" = "05c6202ed4da8964fe8407ea54a5297f454933ef"
+      - name: Prohibit untrusted social-network interception or remote code
+        run: |
+          if grep -Ein '\$httpClient|\$task\.fetch|\$persistentStore|eval\(|new Function|ctx\.http|\$done\(|https://.*(login|graphql|friendships)' native/v5/research/social-plus-audit.js; then
+            echo "Restricted runtime primitive introduced"; exit 1
+          fi
