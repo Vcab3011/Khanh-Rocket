@@ -44,7 +44,7 @@ def render():
     source=original.decode("utf8")
     component=COMP.read_text("utf8").strip()
     if "function khanhCaptionV4(" not in component: raise ValueError("missing caption helper")
-    for needle in (BASE,FLAG,INSERT,"\n})();"):
+    for needle in (BASE,FLAG,INSERT):
         if source.count(needle)!=1: raise ValueError("unexpected R3 source anchor: "+needle)
     source=source.replace(BASE,BASE+"\n var canEnhanceV4=false;",1)
     source=source.replace(FLAG,FLAG+"\n     canEnhanceV4=true;",1)
