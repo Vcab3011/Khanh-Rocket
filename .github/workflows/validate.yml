@@ -21,6 +21,8 @@ jobs:
           python native/tools/audit_pipeline.py > /tmp/khanh-native-audit.json
       - name: Test Khanh Native policy modules (offline)
         run: node --test native/tests/*.test.cjs
+      - name: Validate independent V2 scriptlets and protobuf codecs
+        run: node --test native/v2/tests/*.test.cjs
       - name: Validate generated profiles
         run: |
           python tools/build.py --profile canada-direct
