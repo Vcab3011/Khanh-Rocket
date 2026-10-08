@@ -1,0 +1,238 @@
+{
+  "version": 1,
+  "asOf": "2026-10-08",
+  "name": "Instagram Plus",
+  "productScope": "individual-instagram-plus",
+  "notEquivalentTo": [
+    "Meta Verified",
+    "Meta One Core",
+    "Meta One Premium"
+  ],
+  "sourceQuality": "official-product-announcement",
+  "notes": [
+    "Feature catalog documents product capabilities, not current per-account availability or iOS endpoint ownership.",
+    "Boundary is a research hypothesis about enforcement, not verified private implementation.",
+    "One additional user-screenshot offer claims story viewer timestamps; tracked separately pending official feature mapping.",
+    "Meta One Core/Premium bundles may include Instagram Plus features; purchasing/bundle state remains unverified."
+  ],
+  "features": [
+    {
+      "key": "story_spotlight",
+      "name": "Story Spotlight",
+      "category": "distribution",
+      "boundary": "server_ranking",
+      "firstConfirmed": "jun_2026",
+      "source": "https://about.fb.com/ltam/news/2026/06/presentamos-instagram-plus/",
+      "acceptanceSignal": "consented_story_priority",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "super_hearts",
+      "name": "Super Hearts",
+      "category": "social_interaction",
+      "boundary": "server_mutation",
+      "firstConfirmed": "jun_2026",
+      "source": "https://about.fb.com/ltam/news/2026/06/presentamos-instagram-plus/",
+      "acceptanceSignal": "consented_reaction_receipt",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "story_audience_lists",
+      "name": "Multiple Story Audiences",
+      "category": "privacy",
+      "boundary": "server_privacy",
+      "firstConfirmed": "jun_2026",
+      "source": "https://about.fb.com/ltam/news/2026/06/presentamos-instagram-plus/",
+      "acceptanceSignal": "consented_audience_access",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "story_extend_48h",
+      "name": "Story Extend 48 Hours",
+      "category": "story_lifecycle",
+      "boundary": "server_mutation",
+      "firstConfirmed": "jun_2026",
+      "source": "https://about.fb.com/ltam/news/2026/06/presentamos-instagram-plus/",
+      "acceptanceSignal": "story_visible_after_24h",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "story_preview",
+      "name": "Story Preview",
+      "category": "privacy",
+      "boundary": "server_privacy",
+      "firstConfirmed": "jun_2026",
+      "source": "https://about.fb.com/ltam/news/2026/06/presentamos-instagram-plus/",
+      "acceptanceSignal": "two_consented_accounts_preview_scope",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "story_rewatch_insights",
+      "name": "Story Rewatch Insights",
+      "category": "analytics",
+      "boundary": "server_query",
+      "firstConfirmed": "jun_2026",
+      "source": "https://about.fb.com/ltam/news/2026/06/presentamos-instagram-plus/",
+      "acceptanceSignal": "aggregate_rewatch_count_only",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "story_viewer_search",
+      "name": "Search Viewer List",
+      "category": "analytics",
+      "boundary": "server_query",
+      "firstConfirmed": "jun_2026",
+      "source": "https://about.fb.com/ltam/news/2026/06/presentamos-instagram-plus/",
+      "acceptanceSignal": "search_own_story_viewers",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "custom_app_icon",
+      "name": "Custom App Icon",
+      "category": "customization",
+      "boundary": "ui_account_gate",
+      "firstConfirmed": "jun_2026",
+      "source": "https://about.fb.com/ltam/news/2026/06/presentamos-instagram-plus/",
+      "acceptanceSignal": "icon_changed_after_relaunch",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "custom_bio_font",
+      "name": "Custom Bio Font",
+      "category": "customization",
+      "boundary": "ui_account_gate",
+      "firstConfirmed": "jun_2026",
+      "source": "https://about.fb.com/ltam/news/2026/06/presentamos-instagram-plus/",
+      "acceptanceSignal": "font_visible_after_relaunch",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "profile_six_pins",
+      "name": "Up to Six Profile Pins",
+      "category": "profile",
+      "boundary": "server_mutation",
+      "firstConfirmed": "jun_2026",
+      "source": "https://about.fb.com/ltam/news/2026/06/presentamos-instagram-plus/",
+      "acceptanceSignal": "pin_count_persists_on_profile",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "post_directly_profile",
+      "name": "Post Directly to Profile",
+      "category": "profile",
+      "boundary": "server_mutation",
+      "firstConfirmed": "jun_2026",
+      "source": "https://about.fb.com/ltam/news/2026/06/presentamos-instagram-plus/",
+      "acceptanceSignal": "consented_visibility_no_feed_distribution",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "custom_dm_fonts",
+      "name": "Custom DM Fonts",
+      "category": "customization",
+      "boundary": "ui_account_gate",
+      "firstConfirmed": "sep_2026",
+      "source": "https://about.fb.com/news/2026/09/introducing-meta-one-subscription-service-more-features-ai/",
+      "acceptanceSignal": "font_applies_in_allowed_dm",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "custom_story_fonts",
+      "name": "Custom Story Fonts",
+      "category": "customization",
+      "boundary": "ui_account_gate",
+      "firstConfirmed": "sep_2026",
+      "source": "https://about.fb.com/news/2026/09/introducing-meta-one-subscription-service-more-features-ai/",
+      "acceptanceSignal": "font_applies_in_story_editor",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "selected_story_viewer_alerts",
+      "name": "Story Viewer Notifications",
+      "category": "analytics",
+      "boundary": "server_notification",
+      "firstConfirmed": "sep_2026",
+      "source": "https://about.fb.com/news/2026/09/introducing-meta-one-subscription-service-more-features-ai/",
+      "acceptanceSignal": "alert_received_for_consented_viewer",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    },
+    {
+      "key": "dm_previews",
+      "name": "DM Previews",
+      "category": "privacy",
+      "boundary": "server_privacy",
+      "firstConfirmed": "sep_2026",
+      "source": "https://about.fb.com/news/2026/09/introducing-meta-one-subscription-service-more-features-ai/",
+      "acceptanceSignal": "preview_ui_only_no_unconsented_read",
+      "apiEndpoint": null,
+      "iosBinaryVerified": false,
+      "backendAuthorizationVerified": false
+    }
+  ],
+  "observedOnly": [
+    {
+      "key": "story_view_timestamps",
+      "name": "See When Your Story Was Viewed",
+      "source": "user-provided-instagram-plus-offer-screenshot-2026-10-08",
+      "apiEndpoint": null,
+      "relationToOtherFeatures": "unknown"
+    },
+    {
+      "key": "trial_one_month",
+      "name": "Free One-Month Trial Offer",
+      "source": "user-provided-instagram-plus-offer-screenshot-2026-10-08",
+      "priceShown": "CA$0.00 trial",
+      "doesNotProveEntitlement": true
+    },
+    {
+      "key": "monthly_offer",
+      "name": "Monthly Offer",
+      "source": "user-provided-instagram-plus-offer-screenshot-2026-10-08",
+      "priceShown": "CA$4.49/month",
+      "doesNotProveEntitlement": true
+    },
+    {
+      "key": "yearly_offer",
+      "name": "Yearly Offer",
+      "source": "user-provided-instagram-plus-offer-screenshot-2026-10-08",
+      "priceShown": "CA$42.99/year",
+      "doesNotProveEntitlement": true
+    }
+  ],
+  "additionalSources": {
+    "mobileConfig": "https://engineering.fb.com/2024/06/11/core-infra/mobileconfig-meta-mixed-reality-mr/",
+    "mobileGraphQL": "https://engineering.fb.com/2025/03/31/data-infrastructure/mobile-graphql-meta-2025/",
+    "restMigration": "https://engineering.fb.com/2024/12/18/ios/how-we-think-about-threads-ios-performance/",
+    "graphqlMonolith": "https://graphql.org/conf/2026/schedule/db3a6a6b83a936623e0ac45938bbb7ef/",
+    "bloksThirdParty": "https://github.com/novitae/igbloks",
+    "appleServerEntitlements": "https://developer.apple.com/documentation/StoreKit/determining-service-entitlement-on-the-server"
+  }
+}
