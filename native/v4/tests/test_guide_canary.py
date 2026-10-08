@@ -51,7 +51,7 @@ class V4Isolation(unittest.TestCase):
         self.assertNotIn("sub.store",src)
         profile=(ROOT/V4_PATH).read_text(encoding="utf8")
         self.assertEqual(profile.count("youtube.native.guide = "),1)
-        self.assertFalse(re.search(r"script-path=https?://(?:?!raw\\.githubusercontent).*guide",profile))
+        self.assertIn("script-path=https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/"+GUIDE_SHA+"/"+SCRIPT,profile)
 
 if __name__=="__main__":
     unittest.main()
