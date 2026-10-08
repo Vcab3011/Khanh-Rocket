@@ -139,3 +139,12 @@ test("YouTube: Watch wraps player under contents[1].player[2]; unsupported route
   assert.equal(findField(findField(findField(out.body,1)[0],2)[0],7).length,0);
   assert.deepEqual(run("youtube-player-protobuf.js",{url:"https://youtubei.googleapis.com/youtubei/v1/browse"},{body:source}),{});
 });
+
+test("YouTube Shorts: retain entries with overlay; drop entries missing it",()=>{
+ const good=field(2,2,field(1,2,field(139608561,2,field(8,2,fbytes(1,"overlay")))));
+ const bad=field(2,2,field(1,2,field(139608561,2,fbytes(2,"no-overlay"))));
+ const result=run("youtube-player-protobuf.js",{url:"https://youtubei.googleapis.com/youtubei/v1/reel/reel_watch_sequence"},{body:join(good,bad,fbytes(99,"unknown"))});
+ assert.ok(result.body instanceof Uint8Array);
+ assert.equal(findField(result.body,2).length,1);
+ assert.equal(Buffer.from(findField(result.body,99)[0]).toString(),"unknown");
+});
