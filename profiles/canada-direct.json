@@ -1,0 +1,6 @@
+{
+  "name": "Khanh Rocket - Canada Direct",
+  "description": "No proxy routing; safe debugging baseline",
+  "rules": [],
+  "final": "DIRECT"
+}

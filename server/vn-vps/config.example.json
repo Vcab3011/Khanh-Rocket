@@ -1,0 +1,7 @@
+{
+  "server": "0.0.0.0",
+  "server_port": 8388,
+  "password": "REPLACE_WITH_RANDOM_SECRET",
+  "method": "chacha20-ietf-poly1305",
+  "mode": "tcp_and_udp"
+}

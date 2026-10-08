@@ -1,0 +1,35 @@
+{
+  "source": {
+    "url": "https://raw.githubusercontent.com/Gaucuto/ver2promax/refs/heads/main/10in1",
+    "repository": "Gaucuto/ver2promax",
+    "observed_branch_head": "70a1343587324ff5a17195d8847ce55001f9ed44",
+    "date_reviewed": "2026-10-08"
+  },
+  "summary": {
+    "script_declarations": 17,
+    "unique_non_substore_javascript_files_read": 13,
+    "substore_release_artifacts_not_read": 3,
+    "proxy_nodes_declared": 0,
+    "mitm_explicit_hostname_patterns": 18
+  },
+  "modules": [
+    "Sub-Store Core",
+    "Sub-Store Simple",
+    "Sub-Store Sync",
+    "YouTube request",
+    "YouTube response",
+    "Spotify JSON",
+    "Spotify Proto",
+    "SoundCloud Go+",
+    "Alight Motion",
+    "PicsArt",
+    "Wink",
+    "Truecaller",
+    "KineMaster",
+    "CamScanner",
+    "BeautyPlus",
+    "Locket / RevenueCat",
+    "RevenueCat header"
+  ],
+  "note": "Legacy metadata only; no third-party JavaScript code is bundled or enabled. Full raw source audit inventory is retained in the downloadable v0.1 archive."
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Khanh Rocket - VN Split",
+  "description": "Only .vn domains use Home-selected VN proxy; all other traffic DIRECT",
+  "rules": [
+    "IP-CIDR,10.0.0.0/8,DIRECT,no-resolve",
+    "IP-CIDR,172.16.0.0/12,DIRECT,no-resolve",
+    "IP-CIDR,192.168.0.0/16,DIRECT,no-resolve",
+    "DOMAIN-SUFFIX,vn,PROXY"
+  ],
+  "final": "DIRECT"
+}

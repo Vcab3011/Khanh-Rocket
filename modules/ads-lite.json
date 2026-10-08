@@ -1,0 +1,11 @@
+{
+  "name": "ads-lite",
+  "kind": "domain-rules",
+  "default_enabled": false,
+  "description": "Optional basic ad domains; can break some services",
+  "rules": [
+    "DOMAIN-SUFFIX,doubleclick.net,REJECT",
+    "DOMAIN-SUFFIX,googlesyndication.com,REJECT",
+    "DOMAIN-SUFFIX,googleadservices.com,REJECT"
+  ]
+}

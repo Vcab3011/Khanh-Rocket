@@ -1,0 +1,10 @@
+services:
+  ssserver:
+    image: ghcr.io/shadowsocks/ssserver-rust:v1.24.0
+    container_name: khanh-rocket-vn
+    restart: unless-stopped
+    ports:
+      - "8388:8388/tcp"
+      - "8388:8388/udp"
+    volumes:
+      - ./config.json:/etc/shadowsocks-rust/config.json:ro

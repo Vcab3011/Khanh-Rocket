@@ -1,0 +1,7 @@
+{
+  "name": "legacy-premium-review",
+  "kind": "audit-only",
+  "default_enabled": false,
+  "allow_build": false,
+  "description": "Third-party subscription spoofing scripts are catalogued but intentionally not executed. See inventory/legacy_scripts.json and reports/SECURITY_AUDIT.md."
+}
