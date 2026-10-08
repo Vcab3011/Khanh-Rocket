@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "script_blobs": {
+    "lab/build/egern-observer.js": {
+      "ref": "f9c72dff2a4f92e7c93a9c1a44777e286f0a5ea3",
+      "git_blob_sha1": "43fa01dcbe978507056e089da75f990f2221355d",
+      "sha256": "b394e56f14b06160565ac936f396eba65563e75591cc58eff54bb17745ba375e"
+    },
+    "lab/build/egern-status.js": {
+      "ref": "f9c72dff2a4f92e7c93a9c1a44777e286f0a5ea3",
+      "git_blob_sha1": "bb1f4598b6b03c02c07da08d21a57fa97a54ef3e",
+      "sha256": "a85ccd83993ca41534f0580d7d408206763836970a9ab90efebc51fea753599c"
+    },
+    "lab/build/egern-reset.js": {
+      "ref": "3f9f748ca90e7cf2c68aef1f039014d7c8b6c7f6",
+      "git_blob_sha1": "b0133372e4f3618f90bf092cd13ff816804dc5cc",
+      "sha256": "82890413dfc581304d3474a4b081ffeb7ab07efbb9f5ea57cc5648cd16727ed9"
+    }
+  }
+}

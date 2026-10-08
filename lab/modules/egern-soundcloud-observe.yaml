@@ -6,8 +6,9 @@ scriptings:
   - http_response:
       name: "Khanh SoundCloud Feature Probe"
       match: '^https://api-mobile\.soundcloud\.com/configuration/ios([?#]|$)'
-      script_url: "https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/d735822182c8ea215739aa595f6cfff815ea8bac/lab/build/egern-observer.js"
+      script_url: "https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/f9c72dff2a4f92e7c93a9c1a44777e286f0a5ea3/lab/build/egern-observer.js"
       body_required: true
+      binary_body: true
       max_size: 262144
       timeout: 10
       update_interval: 86400

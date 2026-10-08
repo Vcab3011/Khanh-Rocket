@@ -94,6 +94,7 @@ python -m pip install PyYAML==6.0.2
 node --test lab/tests/*.test.cjs
 python -m unittest discover -s lab/tests -p "test_*.py" -v
 python lab/tools/build_runtime.py --check
+python lab/tools/audit_pins.py
 python tools/validate_legacy.py
 python native/v3/audit_supply_chain.py
 ```
@@ -106,7 +107,9 @@ Official API/configuration documentation rechecked on 2026-10-08: [JavaScript AP
 
 Tests cover both minimal synthetic contexts and Node's real Fetch `Response`/`Headers`. Neither executes Egern's JavaScript engine. Before a spare-device pilot, verify module import, binary return behavior, status/Content-Type/Content-Length/Content-Encoding, missing/max-size body behavior, response timing, and widget rendering on the exact Egern version. Keep the existing Shadowrocket V3 profile and its YouTube player pin unchanged.
 
-Remaining debt: shared local storage updates are read/append/write without documented atomic transactions, so concurrent captures can lose a metadata event; 32-event history is diagnostic sampling, not complete traffic accounting. Product mapping is a pure classifier but is not hooked by the current Locket module. Automatic experiment scheduling, backend entitlement verification, arbitrary app adapters and production promotion remain outside this patch.
+Remaining debt: shared local storage updates are read/append/write without documented atomic transactions, so concurrent captures can lose a metadata event; 32-event history is diagnostic sampling, not complete traffic accounting. TTL removes expired events on the next append and filters widget reads; an idle device does not automatically erase persisted metadata, so use manual reset after an experiment. Product mapping is a pure classifier but is not hooked by the current Locket module. Automatic experiment scheduling, backend entitlement verification, arbitrary app adapters and production promotion remain outside this patch.
+
+`lab/supply-chain-lock.json` records exact first-party commit refs, Git blob IDs and SHA-256 for observer, status and reset. `audit_pins.py` checks all five module URLs against that inventory and compares local bundles to the actual pinned Git bytes offline (full history required). The build check includes the reset template. For an intentional code update: build and test first, commit the reviewed bundle bytes, then update pins/lock in a separate commit; never pin a mutable branch or silently refresh a protected baseline. JSON observers opt into documented `binary_body: true` for byte handling. These source checks do not attest bytes downloaded by Egern on a device.
 
 ## Attribution
 
