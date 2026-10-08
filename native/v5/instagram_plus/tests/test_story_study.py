@@ -49,6 +49,11 @@ class StoryResearchTest(unittest.TestCase):
         self.assertEqual(a["assignmentCount"], 3)
         self.assertEqual(a["interpretation"], "multiple_allocations")
 
+    def test_impossible_unique_viewer_count_is_flagged_as_inconsistent(self):
+        result = STUDY.ambiguity(2, 3, "unique_rewatchers")
+        self.assertEqual(result["assignmentCount"], 0)
+        self.assertEqual(result["interpretation"], "inconsistent_with_assumptions")
+
     def test_single_possible_allocation_is_conditional_not_identity_proof(self):
         a = STUDY.ambiguity(1, 2, "replay_events")
         self.assertEqual(a["assignmentCount"], 1)
