@@ -1,10 +1,12 @@
-# Khanh Rocket v0.1
+# Khanh Rocket
 
-Personal modular Shadowrocket routing baseline and static audit.
+Shadowrocket 10in1 compatibility profile plus separate experimental routing profiles.
 
-**Status:** Generated configurations passed static checks; not yet tested on an iPhone or deployed to a Vietnamese proxy endpoint. **No working VPN server is bundled.**
+**Status:** The user reported the 10in1 profile working on iPhone/iPad after re-import and enabling HTTPS Decryption (2026-10-08). This is a device observation, not a guarantee of future app compatibility or an audit of remote scripts. The separate generated routing profiles have not been device-verified. **No working VPN server is bundled.**
 
 ## Profiles
+
+- `build/khanh-rocket.conf`: user-confirmed working 10in1 compatibility profile; **do not regenerate or overwrite** with the modular builder.
 
 - `build/vn-split.conf`: routes `.vn` domains via a Home-selected proxy; other traffic direct.
 - `build/vn-full.conf`: routes most Internet traffic through a selected Vietnam proxy.
@@ -30,8 +32,8 @@ python -m unittest discover -s tests -v
 
 ## Safety
 
-- No HTTPS MITM, injected root CA, active third-party JavaScript, or subscription spoofing in built configurations.
-- Gấu Apple and upstream scripts are reviewed as historical references, **not** shipped or run; see `reports/SECURITY_AUDIT.md`.
+- The **separate generated routing profiles** have no HTTPS MITM, injected root CA, active third-party JavaScript, or subscription spoofing. **The 10in1 compatibility profile DOES enable HTTPS MITM and third-party scripts.**
+- The 10in1 profile references remote third-party scripts that Shadowrocket may execute. Their contents can change independently of this repository. See `reports/SECURITY_AUDIT.md`.
 - The VPS template uses a placeholder password. Never commit `server/vn-vps/config.json`.
 - A VPS gives datacenter IP, not necessarily residential IP. CGNAT may prevent hosting at home.
 - Independent dynamic testing is needed; passing static checks does not guarantee Shadowrocket compatibility.
@@ -42,8 +44,12 @@ Source reviewed: https://github.com/Gaucuto/ver2promax/blob/main/10in1 at commit
 
 `https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/main/build/khanh-rocket.conf`
 
-The stable URL now serves the **10in1 compatibility profile**, not the earlier privacy-only profile. It enables URL/Header Rewrite, Map Local, MITM and remote third-party JavaScript. It is experimental and **not security audited**; only install a HTTPS certificate you explicitly trust. Read [compatibility notes](docs/LEGACY_10IN1.md) before using. The older privacy baseline remains at `build/apps-privacy.conf`.
+The stable URL now serves the **10in1 compatibility profile**, not the earlier privacy-only profile. It enables URL/Header Rewrite, Map Local, MITM and remote third-party JavaScript. It has not passed a complete security audit; only install an HTTPS certificate you explicitly trust. Read [compatibility notes](docs/LEGACY_10IN1.md) before using. The older privacy baseline remains at `build/apps-privacy.conf`.
 
 ## Phase 2 preview (experimental)
 
 Phase 2 introduces: 12 opt-in app-specific domain filters, a deterministic rules compiler, stricter linting, iPad test notes, and [original 10in1 feature parity audit](docs/PHASE2.md). These are privacy/ad-network controls **not** Premium unlocks; third-party subscription scripts remain audit-only. Import `build/apps-privacy.conf` from the preview branch on a test device.
+
+## Stability and safe upgrades
+
+The working 10in1 profile is protected by an exact effective-directive snapshot and unit tests. See [release gates and rollback](docs/RELEASE_AND_ROLLBACK.md). Run `python tools/audit_10in1.py` for a **read-only** inventory of remote scripts and MITM hostname patterns. This does not download or execute external scripts. All new features must be tested separately before touching the stable profile.
