@@ -35,9 +35,15 @@ jobs:
       - name: Enforce reviewed script hashes and deny unsafe network/storage APIs
         run: python native/v3/audit_supply_chain.py
       - name: Test V3 offline subscription manager with no network APIs
-        run: node --test native/v3/tests/*.test.cjs
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: |
+          python native/v3/tools/fetch_source_references.py
+          node --test native/v3/tests/*.test.cjs
       - name: Verify unchanged player source and deterministic Watch feed adapter
-        run: python native/v3/build_youtube_player_feed.py --check
+        run: |
+          python native/v3/build_youtube_player_feed.py --check
+          python native/v3/build_youtube_r3.py --check
       - name: Validate generated profiles
         run: |
           python tools/build.py --profile canada-direct

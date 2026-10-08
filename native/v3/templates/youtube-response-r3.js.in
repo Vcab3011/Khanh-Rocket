@@ -1,0 +1,59 @@
+/* Khanh Rocket Shadowrocket YouTube response engine, source-behavior revision 3.
+ * Independently implemented typed transformations; original V2 player preserved.
+ * One hook handles Player/Watch/feed/settings. No provider runtime dependency.
+ */
+(function(){
+ "use strict";
+ var request=(typeof $request==="object"&&$request)||{};
+ var response=(typeof $response==="object"&&$response)||{};
+ var answer={};
+ var route=typeof request.url==="string" && request.url.match(/^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(player|get_watch|browse|next|search|reel\/reel_watch_sequence|account\/get_setting)(?:\?|$)/);
+ try {
+  if(route && (request.method===undefined||request.method==="POST")){
+   var bytes=asBytes(response.bodyBytes!==undefined?response.bodyBytes:response.body);
+   if(bytes && bytes.length && bytes.length<=5242880){
+    var input=copy(response);input.body=bytes;delete input.bodyBytes;
+    var s=response.statusCode!==undefined?response.statusCode:response.status;
+    var m=typeof s==="string" && s.match(/^(?:HTTP\/\d(?:\.\d)?\s+)?([1-5]\d\d)(?:\s[^\r\n]*)?$/);
+    var known=typeof s==="number"?s:m?Number(m[1]):null;
+    var conflict=response.status!==undefined && response.statusCode!==undefined &&
+     String(response.status)!==String(response.statusCode) &&
+     !(known===200 && /^HTTP\/\d(?:\.\d)?\s+200(?:\s[^\r\n]*)?$/.test(String(response.status)));
+    if(!conflict && (known===200 || (s===undefined && known===null))){
+     if(known===200)input.status=200;
+     var p;
+     if(/^(player|get_watch|reel\/reel_watch_sequence)$/.test(route[1])){
+      player(request,input,function(v){if(p===undefined)p=v;});answer=p||{};
+     }
+     if(answer.body!==undefined)input.body=answer.body;
+     var f;
+     try{feed(request,input,function(v){if(f===undefined)f=v;});}catch(_){}
+     if(f && f.body!==undefined)answer=f;
+    }
+   }
+  }
+ }catch(_){}
+ try {
+  if(route && typeof console!=="undefined" && typeof console.log==="function")
+   console.log("KR-YT response-r3 route="+route[1]+" result="+(answer.body!==undefined?"changed":"pass"));
+ }catch(_){}
+ // Shadowrocket/Surge contract used by the reference adapter: body Uint8Array.
+ $done(answer);
+ function copy(o){var out={};Object.keys(o).forEach(function(k){out[k]=o[k];});return out;}
+ function asBytes(v){
+  if(v instanceof Uint8Array)return v;
+  if(typeof ArrayBuffer!=="undefined" && v instanceof ArrayBuffer)return new Uint8Array(v);
+  if(typeof ArrayBuffer!=="undefined" && ArrayBuffer.isView(v))return new Uint8Array(v.buffer,v.byteOffset,v.byteLength);
+  if(Array.isArray(v)){
+   for(var i=0;i<v.length;i++)if(!Number.isInteger(v[i])||v[i]<0||v[i]>255)return null;
+   return new Uint8Array(v);
+  }
+  return null;
+ }
+ function player($request,$response,$done){
+@@PLAYER@@
+ }
+ function feed($request,$response,$done){
+@@FEED@@
+ }
+})();
