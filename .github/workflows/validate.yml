@@ -21,6 +21,5 @@ jobs:
           python tools/build.py --profile vn-split
           python tools/build.py --profile vn-full
           python tools/build.py --profile apps-privacy
-          python tools/build.py --profile apps-privacy --output build/khanh-rocket.conf
-          git diff --exit-code -- build/khanh-rocket.conf
-          for f in build/*.conf; do python tools/validate.py "$f"; done
+          for f in build/apps-privacy.conf build/canada-direct.conf build/vn-split.conf build/vn-full.conf; do python tools/validate.py "$f"; done
+          python tools/validate_legacy.py
