@@ -136,7 +136,7 @@ The fixture is **synthetic**, not captured from the user's Instagram account.
 | Milestone | Required proof | Status |
 |---|---|---|
 | S0: Scope & source confidence | Meta launch, Meta clarification, screenshot, competing public anecdote separated | Completed |
-| S1: Safe synthetic measurement | Parser validates, rejects usernames and tokens, reports deltas and ambiguity | Implemented; CI pending |
+| S1: Safe synthetic measurement | Parser validates, rejects usernames and tokens, reports deltas and ambiguity | **CI passed** (22 Story-specific tests; 42 Instagram tests overall, 23 iOS research and 7 Node regressions) |
 | S2: Timestamp mechanism | Repeated iPhone observations with A/B control vs refresh | **No device evidence** |
 | S3: Counter definition | 2nd/3rd A play then B replay, compare event vs unique count | **No device evidence** |
 | S4: Private endpoint attribution | Verified, authorized iOS evidence with no token/personal media in repo | **Not discovered** |
