@@ -1,0 +1,10 @@
+name: "Khanh Rocket - Egern Cache Status"
+description: "Local read-only cache observation status. No premium unlock, no HTTPS interception."
+author: "Vcab3011"
+homepage: "https://github.com/Vcab3011/Khanh-Rocket"
+scriptings:
+  - generic:
+      name: "Khanh Locket Cache Status"
+      script_url: "https://raw.githubusercontent.com/Vcab3011/Khanh-Rocket/2843cf5980285e1f09a0369ede85a3837b06ad6b/egern/scripts/locket-cache-widget.js"
+      update_interval: 86400
+      timeout: 10
