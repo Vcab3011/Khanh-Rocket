@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 from urllib.parse import urlsplit
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[2]
 LOCK = ROOT / "native" / "v3" / "supply-chain-lock.json"
 PROFILES = [
     ROOT / "native" / "v3" / "build" / "privacy-canary.conf",
