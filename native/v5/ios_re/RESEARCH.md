@@ -131,6 +131,19 @@ python -m unittest discover -s native/v5/ios_re/tests -p 'test_*.py' -v
 
 *The filenames in these commands are illustrative, **not** actual captures of the user's device.* Input is never transferred to our server by the script. Redirect outputs locally for your inspection, then share only the sanitized summary if you choose to. Do **not** collect unconsented users' media/messages or use instruments to bypass account/device attestation.
 
+## 5A. Preferred iPhone source: Apple's App Privacy Report (no MITM)
+
+Apple's iOS **App Privacy Report** records per-app contacted domains on-device and can export NDJSON, making it the least invasive *first data acquisition* step. It records up to seven days of activity, not exact per-button events. It **does not** reveal HTTP bodies, Plus entitlement fields, gRPC method names or hidden application state. Apple source: https://developer.apple.com/documentation/Network/inspecting-app-activity-data
+
+Implemented `native/v5/ios_re/apple_privacy_report.py`:
+- Locally reads a user-owned NDJSON export with an explicit app selection and exact bundle-ID selector. The bundle ID must be read from the user's own export; **no unverified Instagram/Snapchat bundle identifier is embedded or inferred**.
+- Outputs only grouped initiated-by-app/user counts for related/other domain families; strips exact bundle ID, full domain/subdomain, context, timestamps, resources and all other data.
+- Does not intercept HTTPS, request permissions, access the network, modify the subscription or scan other applications' records for output.
+- No domain-group correlation can prove a paid subscription or exact internal endpoint. Domains owned by a CDN or external cloud may be categorized as `other`.
+- Tests cover cross-app isolation, malicious lookalike domains, credential/context non-disclosure and file limits.
+
+See [IPHONE_PLAYBOOK.md](./IPHONE_PLAYBOOK.md) for the Settings path, safe local commands and the no-raw-capture rule.
+
 ## 6. Controlled iPhone test matrix (target app versions unknown)
 
 | Experiment | Consent & setup | Manual action | Evidence expected | Boundary and stop rule |
