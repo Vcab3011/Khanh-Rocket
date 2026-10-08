@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Test privacy-safe offline HAR research and transport grouping
+      - name: Test privacy-safe HAR and Apple App Privacy Report analysis
         run: python -m unittest discover -s native/v5/ios_re/tests -p 'test_*.py' -v
       - name: Test Snapchat+ and Instagram Plus feature matrix isolation
         run: node --test native/v5/tests/social-plus-audit.test.cjs
@@ -30,7 +30,7 @@ jobs:
           test "$(git rev-parse HEAD:build/khanh-rocket-v3-test.conf)" = "05c6202ed4da8964fe8407ea54a5297f454933ef"
       - name: Assert no network or dynamic code in iOS research analyzer
         run: |
-          if grep -En 'import (requests|urllib.request|socket|subprocess)|from (requests|urllib.request|socket|subprocess) |eval\(|exec\(|os\.system\(|http\.client' native/v5/ios_re/har_metadata.py; then
+          if grep -En 'import (requests|urllib.request|socket|subprocess)|from (requests|urllib.request|socket|subprocess) |eval\(|exec\(|os\.system\(|http\.client' native/v5/ios_re/har_metadata.py native/v5/ios_re/apple_privacy_report.py; then
             echo "Unexpected execution/network dependency in passive analyzer"
             exit 1
           fi
