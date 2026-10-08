@@ -38,14 +38,14 @@ test("argument switches blockShorts and disable upload/immersive filtering",()=>
 });
 test("no changes for normal Guide entries; no original payload rewrite",()=>{
  let input=root(item("home"),item("subscriptions"));
- assert.deepEqual(run(input),{});
+ assert.equal(Object.keys(run(input)).length,0);
 });
 test("wrong hostname/path/method/error status and incompatible body safely pass",()=>{
  let b=root(item("FEuploads"));
  for(const opts of [{url:"https://youtubei.googleapis.com.evil.org/youtubei/v1/guide"},
  {url:"https://youtubei.googleapis.com/youtubei/v1/guide_extra"},{method:"GET"},{status:404},
  {status:"HTTP/1.1 503 Service Unavailable"},{other:true}])
-   assert.deepEqual(run(b,opts),{},JSON.stringify(opts));
+   assert.equal(Object.keys(run(b,opts)).length,0,JSON.stringify(opts));
 });
 test("accepts common Shadowrocket HTTP 200 response status syntax",()=>{
  const b=root(item("FEuploads"));
@@ -59,9 +59,9 @@ test("unknown field order and bytes are preserved, including multiple Guide sect
  assert.ok(result.includes(Buffer.from("library")));
 });
 test("malformed binary and large response fail open",()=>{
- assert.deepEqual(run(Buffer.from([0xff])),{});
- assert.deepEqual(run(Buffer.alloc(5242881,0)),{});
- assert.deepEqual(run(Buffer.from([31,139,8,0])),{});
+ assert.equal(Object.keys(run(Buffer.from([0xff]))).length,0);
+ assert.equal(Object.keys(run(Buffer.alloc(5242881,0))).length,0);
+ assert.equal(Object.keys(run(Buffer.from([31,139,8,0]))).length,0);
 });
 test("scripts contain no network clients, purchase simulation, storage or dynamic eval",()=>{
  for(const keyword of ["$httpClient","fetch(","ctx.http","$persistentStore","$prefs","eval(","new Function","store_transaction_id","subscriber","receipt","Gold"]){
