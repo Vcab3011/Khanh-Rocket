@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[3]
 BASE = ROOT / "build" / "khanh-rocket-v3-test.conf"
 BANNER = ROOT / "build" / "khanh-rocket-v3-banner-test.conf"
 PRODUCTION = ROOT / "build" / "khanh-rocket.conf"
-PIN = "9811b9d45503fe39b10177239856597c338b8bf1"
+PIN = "cd925a2817734ac25e77d94e13625081ba2acd5b"
 
 
 def effective(text):
