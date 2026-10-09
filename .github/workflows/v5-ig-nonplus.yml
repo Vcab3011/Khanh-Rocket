@@ -35,7 +35,9 @@ jobs:
           assert a["arithmeticViewsMinusReach"] is None
           assert b["arithmeticViewsMinusReach"]==3
           assert b["arithmeticDiagnostic"]=="excess_display_counts_not_confirmed_story_replays"
-          assert all(value is False for value in b["conclusions"].values() if isinstance(value,bool))
+          assert b["conclusions"]["publicOrNativeAggregateObserved"] is True
+          assert all(value is False for key,value in b["conclusions"].items()
+                     if key != "publicOrNativeAggregateObserved")
           PY
       - name: Test passive iOS privacy and fixture research
         run: python -m unittest discover -s native/v5/ios_re/tests -p 'test_*.py' -v
