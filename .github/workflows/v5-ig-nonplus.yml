@@ -1,0 +1,55 @@
+name: V5 Instagram Non-Plus Baseline
+on:
+  push:
+    branches: ["research/v5-ig-story-no-plus-baseline"]
+  pull_request:
+    paths:
+      - "native/v5/instagram_plus/nonplus_baseline.py"
+      - "native/v5/instagram_plus/fixtures/nonplus_*"
+      - "native/v5/instagram_plus/tests/test_nonplus_baseline.py"
+      - "native/v5/instagram_plus/NO_PLUS_BASELINE.md"
+      - ".github/workflows/v5-ig-nonplus.yml"
+permissions:
+  contents: read
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test Instagram non-Plus & Plus research tools on synthetic data
+        run: python -m unittest discover -s native/v5/instagram_plus/tests -p 'test_*.py' -v
+      - name: Check example outputs explicitly reject replay inference
+        run: |
+          python native/v5/instagram_plus/nonplus_baseline.py native/v5/instagram_plus/fixtures/nonplus_native_synthetic.json > /tmp/ig-personal.json
+          python native/v5/instagram_plus/nonplus_baseline.py native/v5/instagram_plus/fixtures/nonplus_professional_synthetic.json > /tmp/ig-professional.json
+          python - <<'PY'
+          import json
+          a=json.load(open("/tmp/ig-personal.json"))
+          b=json.load(open("/tmp/ig-professional.json"))
+          assert a["arithmeticViewsMinusReach"] is None
+          assert b["arithmeticViewsMinusReach"]==3
+          assert b["arithmeticDiagnostic"]=="excess_display_counts_not_confirmed_story_replays"
+          assert b["conclusions"]["publicOrNativeAggregateObserved"] is True
+          assert all(value is False for key,value in b["conclusions"].items()
+                     if key != "publicOrNativeAggregateObserved")
+          PY
+      - name: Test passive iOS privacy and fixture research
+        run: python -m unittest discover -s native/v5/ios_re/tests -p 'test_*.py' -v
+      - name: Test original social-plus separation
+        run: node --test native/v5/tests/social-plus-audit.test.cjs
+      - name: Protect original V1, V3, and accepted V4 baseline
+        run: |
+          python tools/validate_legacy.py
+          test "$(git rev-parse HEAD:build/khanh-rocket-v3-test.conf)" = "05c6202ed4da8964fe8407ea54a5297f454933ef"
+          test "$(git rev-parse HEAD:native/v4/build/caption-canary.conf)" = "c0de4cad7b85361e2e5a70913aeabe0f1a911e31"
+      - name: Verify offline analyzer has no network or dynamic execution
+        run: |
+          if grep -En 'urllib.request|requests\.|socket\.|subprocess\.|eval\(|exec\(|\$httpClient|Authorization:|fetch\(' native/v5/instagram_plus/nonplus_baseline.py; then
+            echo "Unexpected network or dynamic code"; exit 1
+          fi

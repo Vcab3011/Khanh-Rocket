@@ -1,0 +1,29 @@
+{
+  "schema": "khanh.igplus.nonplus-observation.v1",
+  "accountType": "creator",
+  "measurementSource": "professional_story_insights",
+  "metricComparability": "same_story_same_window",
+  "steps": [
+    {
+      "stage": 0,
+      "event": "baseline",
+      "views": 10,
+      "reach": 9,
+      "viewerListCount": null
+    },
+    {
+      "stage": 1,
+      "event": "replay_by_consenter",
+      "views": 12,
+      "reach": 9,
+      "viewerListCount": null
+    },
+    {
+      "stage": 2,
+      "event": "refresh_only",
+      "views": 12,
+      "reach": 9,
+      "viewerListCount": null
+    }
+  ]
+}
